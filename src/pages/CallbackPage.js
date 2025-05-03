@@ -1,5 +1,4 @@
 // src/pages/CallbackPage.js
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getTokenFromUrl } from "../api/spotify/token";
@@ -9,7 +8,9 @@ const CallbackPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = getTokenFromUrl();
+    const tokenData = getTokenFromUrl();
+    const token = tokenData.access_token;
+
     if (token) {
       localStorage.setItem("spotify_token", token);
       setAccessToken(token);
@@ -20,7 +21,7 @@ const CallbackPage = () => {
     }
   }, [navigate]);
 
-  return <div>Redirecting...</div>;
+  return <div>WAIT FOR THE VIBE BRUH....</div>;
 };
 
 export default CallbackPage;
