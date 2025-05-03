@@ -1,7 +1,7 @@
 // src/apis/spotify/auth.js
 
 const CLIENT_ID = "e7046a4937da4182b586c352a0c66d3d"; // replace with your actual Client ID
-const REDIRECT_URI = "http://127.0.0.1:3000/callback";
+const REDIRECT_URI = "https://ando-ten.vercel.app/callback";
 const SCOPES = [
   "user-read-private",
   "user-read-email",
