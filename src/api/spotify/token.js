@@ -9,4 +9,4 @@ export const getTokenFromUrl = () => {
         return acc;
       }, {});
   };
-  s
+  
