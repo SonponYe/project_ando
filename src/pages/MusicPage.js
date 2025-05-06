@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { searchTracks, fetchUserTopTracks } from "../apis/spotify/api";
-import { getStoredToken, isTokenExpired } from "../apis/spotify/token";
+import { searchTracks, fetchUserTopTracks } from "../api/spotify/api";
+import { getStoredToken, isTokenExpired } from "../api/spotify/token";
 import { useNavigate } from "react-router-dom";
 import MusicList from "../components/MusicList";
 import SearchBar from "../components/SearchBar";
