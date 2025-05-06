@@ -1,31 +1,40 @@
 // src/apis/spotify/api.js
 
-import axios from "axios";
+let accessToken = localStorage.getItem("spotify_token");
 
-let token = null;
-
-export const setAccessToken = (accessToken) => {
-  token = accessToken;
+export const setAccessToken = (token) => {
+  accessToken = token;
 };
 
-export const searchTracks = async (query) => {
-  if (!token) throw new Error("Access token is not set.");
+const getHeaders = () => ({
+  Authorization: `Bearer ${accessToken}`,
+  "Content-Type": "application/json",
+});
 
-  const response = await axios.get("https://api.spotify.com/v1/search", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    params: {
-      q: query,
-      type: "track",
-      limit: 10,
-    },
-  });
+export const fetchUserProfile = async () => {
+  try {
+    const res = await fetch("https://api.spotify.com/v1/me", {
+      headers: getHeaders(),
+    });
+    if (!res.ok) throw new Error("Failed to fetch user profile");
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return null;
+  }
+};
 
-  return response.data.tracks.items.map((item) => ({
-    id: item.id,
-    name: item.name,
-    artist: item.artists[0].name,
-    url: item.preview_url,
-  }));
+export const fetchTracksBySearch = async (query) => {
+  try {
+    const res = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`,
+      { headers: getHeaders() }
+    );
+    if (!res.ok) throw new Error("Failed to fetch tracks");
+    const data = await res.json();
+    return data.tracks.items;
+  } catch (error) {
+    console.error("Error searching tracks:", error);
+    return [];
+  }
 };

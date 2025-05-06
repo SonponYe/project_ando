@@ -1,20 +1,22 @@
-// src/pages/HomePage.js
+// src/pages/ErrorPage.js
 import React from "react";
-import Navbar from "../components/Navbar";
-import MoodSelector from "../components/MoodSelector";
+import { useNavigate } from "react-router-dom";
 
-export default function HomePage({ onSelection, onLogout }) {
-  const handleMoodSelect = (mood) => {
-    const genre = "pop"; // or you could let the user pick this too
-    onSelection(mood, genre);
-  };
+const ErrorPage = () => {
+  const navigate = useNavigate();
 
   return (
-    <div>
-      <Navbar onLogout={onLogout} />
-      <h1>Welcome to Ando</h1>
-      <MoodSelector onMoodSelect={handleMoodSelect} />
-      <button onClick={() => onSelection("happy", "pop")}>Load Music</button>
+    <div className="flex flex-col items-center justify-center min-h-screen text-center text-red-600">
+      <h1 className="text-3xl font-bold mb-4">Something went wrong 😕</h1>
+      <p className="mb-4">Could not authenticate or load the app properly.</p>
+      <button
+        onClick={() => navigate("/auth")}
+        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition"
+      >
+        Try Again
+      </button>
     </div>
   );
-}
+};
+
+export default ErrorPage;

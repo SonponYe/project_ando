@@ -1,20 +1,23 @@
 // src/components/GenreSelector.js
 import React from "react";
 
-const genres = ["Pop", "Rock", "Hip-hop", "Jazz", "Electronic", "Classical"];
+const genres = ["Pop", "Rock", "Hip-Hop", "Jazz", "Classical", "Electronic", "Afrobeats"];
 
-export default function GenreSelector({ selectedGenre, onGenreChange }) {
+const GenreSelector = ({ onSelect }) => {
   return (
-    <div>
-      <label>Select Genre: </label>
-      <select value={selectedGenre} onChange={(e) => onGenreChange(e.target.value)}>
-        <option value="">--Choose Genre--</option>
+    <div className="mt-6">
+      <label className="block text-lg font-medium mb-2 text-gray-800">Select Genre</label>
+      <select
+        onChange={(e) => onSelect(e.target.value)}
+        className="w-full p-3 border rounded-xl shadow"
+      >
+        <option value="">-- Choose Genre --</option>
         {genres.map((genre) => (
-          <option key={genre} value={genre}>
-            {genre}
-          </option>
+          <option key={genre} value={genre}>{genre}</option>
         ))}
       </select>
     </div>
   );
-}
+};
+
+export default GenreSelector;

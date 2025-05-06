@@ -1,42 +1,21 @@
 // src/pages/AuthPage.js
-
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { getSpotifyAuthUrl } from "../api/spotify/auth";
+import React from "react";
+import { getSpotifyAuthUrl } from "../apis/spotify/auth";
 
 const AuthPage = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("spotify_token");
-    if (token) {
-      // Already authenticated, redirect to home
-      navigate("/");
-    }
-  }, [navigate]);
-
   const handleLogin = () => {
-    const authUrl = getSpotifyAuthUrl();
-    console.log("Redirecting to:", authUrl); // ✅ This shows the full URL
-    window.location.href = authUrl;
+    window.location.href = getSpotifyAuthUrl();
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h2>Connect to Spotify</h2>
+    <div className="flex flex-col items-center justify-center min-h-screen text-center">
+      <h1 className="text-4xl font-bold mb-4">Welcome to Ando 🎵</h1>
+      <p className="mb-6 text-gray-600">Discover music by mood, genre, or search — no account setup needed.</p>
       <button
         onClick={handleLogin}
-        style={{
-          padding: "12px 24px",
-          backgroundColor: "#1DB954",
-          color: "#fff",
-          border: "none",
-          borderRadius: "30px",
-          cursor: "pointer",
-          fontSize: "16px",
-        }}
+        className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
       >
-        Connect with Spotify
+        Start Listening
       </button>
     </div>
   );

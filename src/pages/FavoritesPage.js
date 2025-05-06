@@ -1,29 +1,39 @@
-// src/pages/FavoritesPage.js
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getSavedTracks } from "../apis/spotify/api";
+import MusicList from "../components/MusicList";
+import { useNavigate } from "react-router-dom";
 
-export default function FavoritesPage({ favorites = [], onPlay }) {
+const FavoritesPage = () => {
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchSavedTracks = async () => {
+      try {
+        const savedTracks = await getSavedTracks();
+        setTracks(savedTracks);
+      } catch (err) {
+        console.error("Error fetching saved tracks:", err);
+        setError("Could not load favorites. Redirecting to auth...");
+        setTimeout(() => navigate("/auth"), 2000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSavedTracks();
+  }, [navigate]);
+
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Your Favorites</h2>
-      {favorites.length === 0 ? (
-        <p>No favorites yet. Go add some!</p>
-      ) : (
-        <ul className="space-y-4">
-          {favorites.map((track, idx) => (
-            <li key={idx} className="border p-2 rounded shadow">
-              <p className="font-semibold">{track.name}</p>
-              <p className="text-sm text-gray-600">{track.artist}</p>
-              <audio controls src={track.url} className="mt-2 w-full" />
-              <button
-                className="mt-2 bg-blue-500 text-white px-3 py-1 rounded"
-                onClick={() => onPlay(track)}
-              >
-                Play
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <h1 className="text-xl font-bold mb-4">Your Favorite Tracks</h1>
+      {loading && <p>Loading favorites...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      {!loading && !error && <MusicList tracks={tracks} />}
     </div>
   );
-}
+};
+
+export default FavoritesPage;

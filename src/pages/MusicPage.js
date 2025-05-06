@@ -1,39 +1,50 @@
-// src/pages/MusicPage.js
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { searchTracks, fetchUserTopTracks } from "../apis/spotify/api";
+import { getStoredToken, isTokenExpired } from "../apis/spotify/token";
+import { useNavigate } from "react-router-dom";
+import MusicList from "../components/MusicList";
 import SearchBar from "../components/SearchBar";
 
-export default function MusicPage({ tracks, onAddFavorite }) {
-  const [searchQuery, setSearchQuery] = useState("");
+const MusicPage = () => {
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const filteredTracks = tracks.filter(
-    (track) =>
-      track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      track.artist.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const token = getStoredToken();
+    if (!token || isTokenExpired()) {
+      navigate("/auth");
+    } else {
+      fetchUserTopTracks()
+        .then((data) => {
+          setTracks(data.items);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching top tracks:", error);
+          navigate("/error");
+        });
+    }
+  }, [navigate]);
+
+  const handleSearch = async (query) => {
+    setLoading(true);
+    try {
+      const data = await searchTracks(query);
+      setTracks(data.tracks.items);
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div>
-      <h2>Tracks</h2>
-   
-
-      {filteredTracks.length === 0 ? (
-        <p>No tracks found</p>
-      ) : (
-        <ul>
-          {filteredTracks.map((track) => (
-            <li key={track.id}>
-              <h3>{track.name}</h3>
-              <p>{track.artist}</p>
-              {track.url ? (
-                <audio controls src={track.url}></audio>
-              ) : (
-                <p>No preview available</p>
-              )}
-              <button onClick={() => onAddFavorite(track)}>❤️ Favorite</button>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="p-4">
+      <SearchBar onSearch={handleSearch} />
+      {loading ? <p>Loading...</p> : <MusicList tracks={tracks} />}
     </div>
   );
-}
+};
+
+export default MusicPage;
