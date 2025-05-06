@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getSavedTracks } from "../apis/spotify/api";
+import { getSavedTracks } from "../api/spotify/api";
 import MusicList from "../components/MusicList";
 import { useNavigate } from "react-router-dom";
 

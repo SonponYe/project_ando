@@ -1,6 +1,6 @@
 // src/pages/AuthPage.js
 import React from "react";
-import { getSpotifyAuthUrl } from "../apis/spotify/auth";
+import { getSpotifyAuthUrl } from "../api/spotify/auth";
 
 const AuthPage = () => {
   const handleLogin = () => {

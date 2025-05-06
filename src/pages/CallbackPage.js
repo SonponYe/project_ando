@@ -1,8 +1,8 @@
 // src/pages/CallbackPage.js
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTokenFromUrl } from "../apis/spotify/token";
-import { setAccessToken } from "../apis/spotify/api";
+import { getTokenFromUrl } from "../apipotify/token";
+import { setAccessToken } from "../api/spotify/api";
 
 const CallbackPage = () => {
   const navigate = useNavigate();
