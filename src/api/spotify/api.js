@@ -1,6 +1,7 @@
 // src/apis/spotify/api.js
+import axios from 'axios';
 
-let accessToken = localStorage.getItem("spotify_token");
+let accessToken = null;
 
 export const setAccessToken = (token) => {
   accessToken = token;
@@ -8,42 +9,37 @@ export const setAccessToken = (token) => {
 
 const getHeaders = () => ({
   Authorization: `Bearer ${accessToken}`,
-  "Content-Type": "application/json",
 });
 
-export const fetchUserProfile = async () => {
-  try {
-    const res = await fetch("https://api.spotify.com/v1/me", {
-      headers: getHeaders(),
-    });
-    if (!res.ok) throw new Error("Failed to fetch user profile");
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    return null;
-  }
-};
-
 export const fetchTracksBySearch = async (query) => {
-  try {
-    const res = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`,
-      { headers: getHeaders() }
-    );
-    if (!res.ok) throw new Error("Failed to fetch tracks");
-    const data = await res.json();
-    return data.tracks.items;
-  } catch (error) {
-    console.error("Error searching tracks:", error);
-    return [];
-  }
+  const res = await axios.get(`https://api.spotify.com/v1/search`, {
+    headers: getHeaders(),
+    params: { q: query, type: 'track', limit: 10 },
+  });
+  return res.data.tracks.items;
 };
 
-export const getSavedTracks = async (token) => {
-    const res = await fetch('https://api.spotify.com/v1/me/tracks', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const data = await res.json();
-    return data.items;
-  };
-  
+export const getSavedTracks = async () => {
+  const res = await axios.get('https://api.spotify.com/v1/me/tracks', {
+    headers: getHeaders(),
+    params: { limit: 10 },
+  });
+  return res.data.items.map(item => item.track);
+};
+
+export const fetchUserProfile = async () => {
+  const res = await axios.get('https://api.spotify.com/v1/me', {
+    headers: getHeaders(),
+  });
+  return res.data;
+};
+
+export const fetchUserTopTracks = async () => {
+  const res = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
+    headers: getHeaders(),
+    params: { limit: 10 },
+  });
+  return res.data.items;
+};
+
+export const searchTracks = fetchTracksBySearch;

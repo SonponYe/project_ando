@@ -1,18 +1,18 @@
 // src/pages/CallbackPage.js
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTokenFromUrl } from "../api/spotify/token";
+import { getTokenFromUrl, storeToken } from "../api/spotify/token";
 import { setAccessToken } from "../api/spotify/api";
 
 const CallbackPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = getTokenFromUrl();
-    if (token) {
-      localStorage.setItem("spotify_token", token);
-      setAccessToken(token);
-      navigate("/home");
+    const { access_token, expires_in } = getTokenFromUrl();
+    if (access_token) {
+      storeToken(access_token, expires_in);
+      setAccessToken(access_token);
+      navigate("/");
     } else {
       navigate("/error");
     }
