@@ -29,11 +29,15 @@ export const isTokenExpired = () => {
   return !expiry || Date.now() > parseInt(expiry, 10);
 };
 
+// src/api/spotify/token.js
 export const getTokenFromUrl = () => {
-  const params = new URLSearchParams(window.location.hash.substring(1));
-  return {
-    access_token: params.get('access_token'),
-    token_type: params.get('token_type'),
-    expires_in: parseInt(params.get('expires_in'), 10),
-  };
+  return window.location.hash
+    .substring(1)
+    .split('&')
+    .reduce((acc, item) => {
+      const [key, value] = item.split('=');
+      acc[key] = decodeURIComponent(value);
+      return acc;
+    }, {});
 };
+

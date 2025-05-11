@@ -8,15 +8,17 @@ const CallbackPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const tokenObj = getTokenFromUrl();
-    const accessToken = tokenObj?.access_token;
-    const expiresIn = tokenObj?.expires_in;
+    const tokenData = getTokenFromUrl();
+    const accessToken = tokenData.access_token;
+    const expiresIn = tokenData.expires_in;
 
     if (accessToken) {
+      console.log('[CallbackPage] Access token received:', accessToken);
       storeToken(accessToken, expiresIn);
       setAccessToken(accessToken);
       navigate('/music');
     } else {
+      console.error('[CallbackPage] No access token found in URL');
       navigate('/error');
     }
   }, [navigate]);

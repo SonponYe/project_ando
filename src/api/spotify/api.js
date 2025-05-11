@@ -4,9 +4,14 @@ import axios from 'axios';
 let accessToken = null;
 
 export const setAccessToken = (token) => {
-  console.log('[Spotify API] Setting access token:', token);
+  if (typeof token === 'string') {
+    console.log('[Spotify API] Setting access token:', token.slice(0, 10) + '...'); // Avoid logging full token
+  } else {
+    console.error('[Spotify API] Invalid token:', token);
+  }
   accessToken = token;
 };
+
 
 const getHeaders = () => {
   if (!accessToken) {
