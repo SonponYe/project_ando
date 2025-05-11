@@ -1,34 +1,37 @@
 // src/App.js
-import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
 import HomePage from './pages/HomePage';
-import MusicPage from './pages/MusicPage';
 import CallbackPage from './pages/CallbackPage';
+import MusicPage from './pages/MusicPage';
+import FavoritesPage from './pages/FavoritesPage';
 import ErrorPage from './pages/ErrorPage';
-import { getStoredToken } from './api/spotify/token';
+
+import { getStoredToken, clearStoredToken } from './api/spotify/token';
 import { setAccessToken } from './api/spotify/api';
 
 function App() {
+  const token = getStoredToken();
+
   useEffect(() => {
-    const storedToken = getStoredToken();
-    if (storedToken) {
-      console.log('[App] Loaded token from localStorage');
-      setAccessToken(storedToken);
-    } else {
+    if (!token) {
       console.warn('[App] No token found in localStorage');
+      clearStoredToken();
+    } else {
+      setAccessToken(token);
     }
-  }, []);
+  }, [token]);
 
   return (
     <Router>
-     <Routes>
-  <Route path="/" element={<HomePage />} />
-  <Route path="/callback" element={<CallbackPage />} />
-  <Route path="/music" element={<MusicPage />} />
-  <Route path="/error" element={<ErrorPage />} />
-  <Route path="*" element={<ErrorPage />} />
-</Routes>
-
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/callback" element={<CallbackPage />} />
+        <Route path="/music" element={token ? <MusicPage /> : <Navigate to="/" />} />
+        <Route path="/favorites" element={token ? <FavoritesPage /> : <Navigate to="/" />} />
+        <Route path="*" element={<ErrorPage />} />
+      </Routes>
     </Router>
   );
 }
