@@ -73,3 +73,10 @@ export const clearStoredToken = () => {
   localStorage.removeItem('expires_at');
   localStorage.removeItem(CODE_VERIFIER_KEY);
 };
+// src/api/spotify/token.js
+
+export const isTokenExpired = () => {
+  const expiryTime = localStorage.getItem('spotify_token_expiry');
+  if (!expiryTime) return true;
+  return Date.now() > parseInt(expiryTime, 10);
+};
