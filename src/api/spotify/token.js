@@ -1,43 +1,75 @@
 // src/api/spotify/token.js
+const CLIENT_ID = 'e7046a4937da4182b586c352a0c66d3d';
+const REDIRECT_URI = 'https://ando-ten.vercel.app/callback';
+const CODE_VERIFIER_KEY = 'pkce_code_verifier';
 
-const TOKEN_KEY = 'spotify_access_token';
-const EXPIRY_KEY = 'spotify_token_expiry';
+const generateRandomString = (length) => {
+  const array = new Uint8Array(length);
+  window.crypto.getRandomValues(array);
+  return Array.from(array, dec => ('0' + dec.toString(16)).slice(-2)).join('');
+};
 
-export const storeToken = (token, expiresIn = 3600) => {
-  const expiryTime = Date.now() + expiresIn * 1000;
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(EXPIRY_KEY, expiryTime.toString());
+const base64UrlEncode = (str) =>
+  btoa(String.fromCharCode.apply(null, new Uint8Array(str)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+export const generateCodeChallenge = async (verifier) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return base64UrlEncode(digest);
+};
+
+export const redirectToSpotifyLogin = async () => {
+  const verifier = generateRandomString(64);
+  const challenge = await generateCodeChallenge(verifier);
+  localStorage.setItem(CODE_VERIFIER_KEY, verifier);
+
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID,
+    response_type: 'code',
+    redirect_uri: REDIRECT_URI,
+    code_challenge_method: 'S256',
+    code_challenge: challenge,
+    scope: 'user-top-read user-library-read',
+  });
+
+  window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+};
+
+export const fetchAccessToken = async (code) => {
+  const verifier = localStorage.getItem(CODE_VERIFIER_KEY);
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: CLIENT_ID,
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: REDIRECT_URI,
+      code_verifier: verifier,
+    }),
+  });
+
+  if (!res.ok) throw new Error('Token exchange failed');
+  const data = await res.json();
+  const expiryTime = Date.now() + data.expires_in * 1000;
+  localStorage.setItem('access_token', data.access_token);
+  localStorage.setItem('expires_at', expiryTime);
+  return data.access_token;
 };
 
 export const getStoredToken = () => {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const expiry = localStorage.getItem(EXPIRY_KEY);
-
-  if (!token || !expiry) return null;
-
-  const isExpired = Date.now() > parseInt(expiry, 10);
-  return isExpired ? null : token;
+  const token = localStorage.getItem('access_token');
+  const expires = parseInt(localStorage.getItem('expires_at'), 10);
+  if (!token || Date.now() > expires) return null;
+  return token;
 };
 
 export const clearStoredToken = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(EXPIRY_KEY);
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('expires_at');
+  localStorage.removeItem(CODE_VERIFIER_KEY);
 };
-
-export const isTokenExpired = () => {
-  const expiry = localStorage.getItem(EXPIRY_KEY);
-  return !expiry || Date.now() > parseInt(expiry, 10);
-};
-
-// src/api/spotify/token.js
-// src/api/spotify/token.js
-export const getTokenFromUrl = () => {
-  const hash = window.location.hash.substring(1); // Remove the "#"
-  return hash.split("&").reduce((acc, current) => {
-    const [key, value] = current.split("=");
-    acc[key] = decodeURIComponent(value);
-    return acc;
-  }, {});
-};
-
-
