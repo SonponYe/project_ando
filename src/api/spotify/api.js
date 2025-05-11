@@ -1,46 +1,67 @@
 // src/api/spotify/api.js
+import axios from 'axios';
 
-let accessToken = '';
+let accessToken = null;
 
 export const setAccessToken = (token) => {
   accessToken = token;
 };
 
-// Search tracks
+const getHeaders = () => {
+  if (!accessToken) {
+    console.warn('[Spotify API] No access token set!');
+    return {};
+  }
+  return {
+    Authorization: `Bearer ${accessToken}`,
+  };
+};
+
+const handleError = (error, context) => {
+  if (error.response) {
+    console.error(`[Spotify API] ${context} failed:`, error.response.data);
+  } else {
+    console.error(`[Spotify API] ${context} failed:`, error.message);
+  }
+};
+
 export const fetchTracksBySearch = async (query) => {
-  const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  const data = await response.json();
-  return data.tracks?.items || [];
+  try {
+    const res = await axios.get('https://api.spotify.com/v1/search', {
+      headers: getHeaders(),
+      params: { q: query, type: 'track', limit: 10 },
+    });
+    return res.data.tracks.items;
+  } catch (err) {
+    handleError(err, 'Search Tracks');
+    return [];
+  }
 };
 
-// Get top tracks
 export const fetchUserTopTracks = async () => {
-  const response = await fetch('https://api.spotify.com/v1/me/top/tracks?limit=20', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  const data = await response.json();
-  return data.items || [];
+  try {
+    const res = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
+      headers: getHeaders(),
+      params: { limit: 10 },
+    });
+    return res.data.items;
+  } catch (err) {
+    handleError(err, 'Top Tracks');
+    return [];
+  }
 };
 
-// Get saved (liked) tracks
 export const getSavedTracks = async () => {
-  const response = await fetch('https://api.spotify.com/v1/me/tracks?limit=20', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  const data = await response.json();
-  return data.items?.map(item => item.track) || [];
+  try {
+    const res = await axios.get('https://api.spotify.com/v1/me/tracks', {
+      headers: getHeaders(),
+      params: { limit: 10 },
+    });
+    return res.data.items.map(item => item.track);
+  } catch (err) {
+    handleError(err, 'Saved Tracks');
+    return [];
+  }
 };
 
-// Alias searchTracks to fetchTracksBySearch
 export const searchTracks = fetchTracksBySearch;
