@@ -1,39 +1,39 @@
-// src/apis/spotify/token.js
+// src/api/spotify/token.js
 
-const TOKEN_KEY = 'spotify_token';
-const TOKEN_TIMESTAMP_KEY = 'spotify_token_timestamp';
-const TOKEN_EXPIRE_KEY = 'spotify_token_expires_in';
+const TOKEN_KEY = 'spotify_access_token';
+const EXPIRY_KEY = 'spotify_token_expiry';
 
 export const storeToken = (token, expiresIn = 3600) => {
+  const expiryTime = Date.now() + expiresIn * 1000;
   localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(TOKEN_TIMESTAMP_KEY, Date.now().toString());
-  localStorage.setItem(TOKEN_EXPIRE_KEY, expiresIn.toString());
+  localStorage.setItem(EXPIRY_KEY, expiryTime.toString());
 };
 
-export const getStoredToken = () => localStorage.getItem(TOKEN_KEY);
+export const getStoredToken = () => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const expiry = localStorage.getItem(EXPIRY_KEY);
 
-export const isTokenExpired = () => {
-  const timestamp = localStorage.getItem(TOKEN_TIMESTAMP_KEY);
-  const expiresIn = localStorage.getItem(TOKEN_EXPIRE_KEY);
+  if (!token || !expiry) return null;
 
-  if (!timestamp || !expiresIn) return true;
-
-  const elapsed = (Date.now() - parseInt(timestamp)) / 1000;
-  return elapsed > parseInt(expiresIn);
+  const isExpired = Date.now() > parseInt(expiry, 10);
+  return isExpired ? null : token;
 };
 
 export const clearStoredToken = () => {
   localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(TOKEN_TIMESTAMP_KEY);
-  localStorage.removeItem(TOKEN_EXPIRE_KEY);
+  localStorage.removeItem(EXPIRY_KEY);
 };
 
-// For parsing access_token and expires_in from the URL
+export const isTokenExpired = () => {
+  const expiry = localStorage.getItem(EXPIRY_KEY);
+  return !expiry || Date.now() > parseInt(expiry, 10);
+};
+
 export const getTokenFromUrl = () => {
-  const hash = window.location.hash.substring(1);
-  const params = new URLSearchParams(hash);
+  const params = new URLSearchParams(window.location.hash.substring(1));
   return {
-    access_token: params.get("access_token"),
-    expires_in: params.get("expires_in") || 3600,
+    access_token: params.get('access_token'),
+    token_type: params.get('token_type'),
+    expires_in: parseInt(params.get('expires_in'), 10),
   };
 };
