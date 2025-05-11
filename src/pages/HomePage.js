@@ -14,7 +14,7 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    window.location.href = getSpotifyAuthUrl();
+    window.location = getSpotifyAuthUrl();
   };
 
   const handleExplore = () => {

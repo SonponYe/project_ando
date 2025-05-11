@@ -21,12 +21,14 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/music" element={<MusicPage />} />
-        <Route path="/callback" element={<CallbackPage />} />
-        <Route path="/error" element={<ErrorPage />} />
-      </Routes>
+     <Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/callback" element={<CallbackPage />} />
+  <Route path="/music" element={<MusicPage />} />
+  <Route path="/error" element={<ErrorPage />} />
+  <Route path="*" element={<ErrorPage />} />
+</Routes>
+
     </Router>
   );
 }

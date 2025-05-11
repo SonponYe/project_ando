@@ -17,6 +17,8 @@ const CallbackPage = () => {
       storeToken(accessToken, expiresIn);
       setAccessToken(accessToken);
       navigate('/music');
+      console.log('[CallbackPage] URL Hash:', window.location.hash);
+
     } else {
       console.error('[CallbackPage] No access token found in URL');
       navigate('/error');

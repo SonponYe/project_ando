@@ -13,9 +13,8 @@ const SCOPES = [
 ];
 
 export const getSpotifyAuthUrl = () => {
-  const scopeParam = encodeURIComponent(SCOPES.join(" "));
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(
     REDIRECT_URI
-  )}&scope=${scopeParam}`;
+  )}&scope=${SCOPES.join('%20')}`;
   return authUrl;
 };
