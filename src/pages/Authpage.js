@@ -4,7 +4,8 @@ import { getSpotifyAuthUrl } from "../api/spotify/auth";
 
 const AuthPage = () => {
   const handleLogin = () => {
-    window.location.href = getSpotifyAuthUrl();
+    const url = getSpotifyAuthUrl();
+    window.location.href = url;
   };
 
   return (

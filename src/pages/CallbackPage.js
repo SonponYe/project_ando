@@ -11,6 +11,8 @@ const CallbackPage = () => {
     const tokenObj = getTokenFromUrl();
     const accessToken = tokenObj?.access_token;
     const expiresIn = tokenObj?.expires_in;
+    console.log('[CallbackPage] Full URL:', window.location.href);
+    console.log('[CallbackPage] Hash:', window.location.hash);
 
     if (accessToken) {
       console.log('[CallbackPage] Received token:', accessToken);
