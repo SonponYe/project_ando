@@ -1,5 +1,4 @@
-// src/App.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
@@ -12,18 +11,23 @@ import { getStoredToken, isTokenExpired, clearStoredToken } from './api/spotify/
 import { setAccessToken } from './api/spotify/api';
 
 function App() {
-  const token = getStoredToken();
-  const expired = isTokenExpired();
+  const [token, setToken] = useState(null);
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
-    if (token && expired) {
+    const t = getStoredToken();
+    const e = isTokenExpired();
+
+    if (t && e) {
       clearStoredToken();
-      window.location.href = '/';
+      setToken(null);
+      setExpired(true);
+    } else if (t && !e) {
+      setAccessToken(t);
+      setToken(t);
+      setExpired(false);
     }
-    if (token && !expired) {
-      setAccessToken(token);
-    }
-  }, [token, expired]);
+  }, []); // Only runs once on mount
 
   return (
     <Router>

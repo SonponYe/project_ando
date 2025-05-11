@@ -19,6 +19,7 @@ const HomePage = () => {
 
   const handleExplore = () => {
     navigate('/music');
+    console.log("Go to Music clicked");
   };
 
 
