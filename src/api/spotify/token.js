@@ -1,6 +1,6 @@
 // src/api/spotify/token.js
 
-const clientId = 'YOUR_SPOTIFY_CLIENT_ID'; // Replace with your actual client ID
+const clientId = 'e7046a4937da4182b586c352a0c66d3d'; // Replace with your actual client ID
 const redirectUri = 'https://ando-ten.vercel.app/callback';
 const scopes = [
   'user-read-private',
