@@ -30,14 +30,14 @@ export const isTokenExpired = () => {
 };
 
 // src/api/spotify/token.js
+// src/api/spotify/token.js
 export const getTokenFromUrl = () => {
-  return window.location.hash
-    .substring(1)
-    .split('&')
-    .reduce((acc, item) => {
-      const [key, value] = item.split('=');
-      acc[key] = decodeURIComponent(value);
-      return acc;
-    }, {});
+  const hash = window.location.hash.substring(1); // Remove the "#"
+  return hash.split("&").reduce((acc, current) => {
+    const [key, value] = current.split("=");
+    acc[key] = decodeURIComponent(value);
+    return acc;
+  }, {});
 };
+
 
