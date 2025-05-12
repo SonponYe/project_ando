@@ -86,3 +86,9 @@ export function getStoredToken() {
 
   return token;
 }
+
+export function isTokenExpired() {
+  const expiry = parseInt(localStorage.getItem('spotify_token_expiry'), 10);
+  return !expiry || Date.now() > expiry;
+}
+
