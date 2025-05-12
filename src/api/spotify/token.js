@@ -1,7 +1,12 @@
 // src/api/spotify/token.js
 const CLIENT_ID = 'e7046a4937da4182b586c352a0c66d3d';
 const REDIRECT_URI = 'https://ando-ten.vercel.app/callback';
-const SCOPES = 'user-read-private user-read-email user-library-read';
+const SCOPES  = [
+  'user-read-private',
+  'user-read-email',
+  'user-library-read',
+  'user-top-read'
+];
 
 function generateCodeVerifier(length = 128) {
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
