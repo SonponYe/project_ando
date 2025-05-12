@@ -1,6 +1,6 @@
 // src/api/spotify/token.js
 
-const SPOTIFY_CLIENT_ID = 'YOUR_SPOTIFY_CLIENT_ID';
+const SPOTIFY_CLIENT_ID = 'e7046a4937da4182b586c352a0c66d3d';
 const REDIRECT_URI = 'https://ando-ten.vercel.app/callback';
 
 const scopes = [

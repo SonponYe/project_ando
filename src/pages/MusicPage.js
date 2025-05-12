@@ -1,128 +1,126 @@
 // src/pages/MusicPage.js
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fetchUserTopTracks, getSavedTracks, searchTracks } from '../api/spotify/api';
 
-const moods = ['Happy', 'Sad', 'Energetic', 'Calm'];
-const genres = ['pop', 'rock', 'hip-hop', 'jazz', 'classical'];
+const moods = [
+  { name: 'Happy', color: '#FFD700' },
+  { name: 'Chill', color: '#00CED1' },
+  { name: 'Energetic', color: '#FF4500' },
+  { name: 'Sad', color: '#708090' },
+];
+
+const genres = ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Afrobeats'];
 
 const MusicPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [tracks, setTracks] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [selectedMood, setSelectedMood] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
 
   useEffect(() => {
-    const loadTracks = async () => {
-      const topTracks = await fetchUserTopTracks();
+    const fetchInitialData = async () => {
       const saved = await getSavedTracks();
-      setTracks(topTracks);
       setFavorites(saved);
+      const top = await fetchUserTopTracks();
+      setTracks(top);
     };
-    loadTracks();
+    fetchInitialData();
   }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!searchTerm) return;
-    const results = await searchTracks(searchTerm);
+    if (!searchQuery.trim()) return;
+    const results = await searchTracks(searchQuery);
     setTracks(results);
   };
 
-  const handleMoodSelect = async (mood) => {
+  const handleMoodClick = (mood) => {
     setSelectedMood(mood);
-    const results = await searchTracks(mood);
-    setTracks(results);
+    setSearchQuery(mood);
+    handleSearch({ preventDefault: () => {} });
   };
 
-  const handleGenreSelect = async (e) => {
+  const handleGenreChange = (e) => {
     const genre = e.target.value;
     setSelectedGenre(genre);
-    if (genre) {
-      const results = await searchTracks(genre);
-      setTracks(results);
-    }
+    setSearchQuery(genre);
+    handleSearch({ preventDefault: () => {} });
   };
 
-  const isFavorite = (trackId) => favorites.some((track) => track.id === trackId);
-
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-black to-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-4">Discover Music</h1>
+    <div style={{ padding: '2rem' }}>
+      <h1>🎧 Your Music Feed</h1>
 
-      {/* Search */}
-      <form onSubmit={handleSearch} className="mb-4 flex gap-2">
+      {/* Search Bar */}
+      <form onSubmit={handleSearch} style={{ marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Search songs, artists..."
-          className="px-4 py-2 rounded text-black w-full"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ padding: '0.5rem', width: '60%' }}
         />
-        <button type="submit" className="px-4 py-2 bg-green-500 rounded hover:bg-green-600">
+        <button type="submit" style={{ padding: '0.5rem', marginLeft: '0.5rem' }}>
           Search
         </button>
       </form>
 
       {/* Mood Cards */}
-      <div className="mb-4">
-        <h2 className="text-xl mb-2">Mood</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {moods.map((mood) => (
-            <div
-              key={mood}
-              className={`p-4 rounded-lg cursor-pointer text-center border ${
-                selectedMood === mood ? 'bg-green-500' : 'bg-white text-black'
-              }`}
-              onClick={() => handleMoodSelect(mood)}
-            >
-              {mood}
-            </div>
-          ))}
-        </div>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+        {moods.map((mood) => (
+          <div
+            key={mood.name}
+            onClick={() => handleMoodClick(mood.name)}
+            style={{
+              backgroundColor: mood.color,
+              color: 'white',
+              padding: '1rem',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              flex: 1,
+              textAlign: 'center',
+              boxShadow: selectedMood === mood.name ? '0 0 10px black' : '',
+            }}
+          >
+            {mood.name}
+          </div>
+        ))}
       </div>
 
       {/* Genre Dropdown */}
-      <div className="mb-4">
-        <h2 className="text-xl mb-2">Genre</h2>
-        <select
-          value={selectedGenre}
-          onChange={handleGenreSelect}
-          className="text-black px-4 py-2 rounded"
-        >
-          <option value="">Select a genre</option>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <label style={{ marginRight: '0.5rem' }}>Genre:</label>
+        <select value={selectedGenre} onChange={handleGenreChange}>
+          <option value="">Select genre</option>
           {genres.map((genre) => (
-            <option key={genre} value={genre}>
-              {genre.charAt(0).toUpperCase() + genre.slice(1)}
-            </option>
+            <option key={genre}>{genre}</option>
           ))}
         </select>
       </div>
 
       {/* Track List */}
-      <div>
-        {tracks.length === 0 ? (
-          <p>No tracks found.</p>
-        ) : (
-          <ul className="grid gap-4">
-            {tracks.map((track) => (
-              <li
-                key={track.id}
-                className="p-4 rounded bg-gray-800 flex items-center justify-between"
-              >
-                <div>
-                  <p className="font-semibold">{track.name}</p>
-                  <p className="text-sm text-gray-400">
-                    {track.artists.map((a) => a.name).join(', ')}
-                  </p>
-                </div>
-                <div>
-                  {isFavorite(track.id) && <span className="text-yellow-400">★</span>}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+      <h2>Results</h2>
+      <div style={{ display: 'grid', gap: '1rem' }}>
+        {tracks.map((track) => (
+          <div key={track.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+            <strong>{track.name}</strong> – {track.artists[0].name}
+            <br />
+            <audio controls src={track.preview_url} style={{ marginTop: '0.5rem' }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Favorites */}
+      <h2 style={{ marginTop: '2rem' }}>❤️ Favorites</h2>
+      <div style={{ display: 'grid', gap: '1rem' }}>
+        {favorites.map((track) => (
+          <div key={track.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+            <strong>{track.name}</strong> – {track.artists[0].name}
+            <br />
+            <audio controls src={track.preview_url} style={{ marginTop: '0.5rem' }} />
+          </div>
+        ))}
       </div>
     </div>
   );
