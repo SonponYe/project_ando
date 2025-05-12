@@ -1,95 +1,93 @@
 // src/api/spotify/token.js
-const CLIENT_ID = 'e7046a4937da4182b586c352a0c66d3d';
+
+const SPOTIFY_CLIENT_ID = 'YOUR_SPOTIFY_CLIENT_ID';
 const REDIRECT_URI = 'https://ando-ten.vercel.app/callback';
-const SCOPES  = [
+
+const scopes = [
   'user-read-private',
   'user-read-email',
   'user-library-read',
-  'user-top-read'
+  'user-top-read',
 ];
 
-function generateCodeVerifier(length = 128) {
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let codeVerifier = '';
+function generateRandomString(length) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const cryptoObj = window.crypto || window.msCrypto;
+  const randomValues = new Uint32Array(length);
+  cryptoObj.getRandomValues(randomValues);
   for (let i = 0; i < length; i++) {
-    codeVerifier += possible.charAt(Math.floor(Math.random() * possible.length));
+    result += charset[randomValues[i] % charset.length];
   }
-  return codeVerifier;
+  return result;
 }
 
 async function generateCodeChallenge(codeVerifier) {
   const encoder = new TextEncoder();
   const data = encoder.encode(codeVerifier);
   const digest = await window.crypto.subtle.digest('SHA-256', data);
-  const base64Digest = btoa(String.fromCharCode(...new Uint8Array(digest)))
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
-  return base64Digest;
 }
 
-export async function redirectToSpotifyAuth() {
-  const codeVerifier = generateCodeVerifier();
+export const redirectToSpotifyAuth = async () => {
+  const codeVerifier = generateRandomString(128);
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
   localStorage.setItem('spotify_code_verifier', codeVerifier);
 
-  const authUrl = new URL('https://accounts.spotify.com/authorize');
-  authUrl.searchParams.set('response_type', 'code');
-  authUrl.searchParams.set('client_id', CLIENT_ID);
-  authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
-  authUrl.searchParams.set('scope', SCOPES.join(' '));
-  authUrl.searchParams.set('code_challenge_method', 'S256');
-  authUrl.searchParams.set('code_challenge', codeChallenge);
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: SPOTIFY_CLIENT_ID,
+    scope: scopes.join(' '),
+    redirect_uri: REDIRECT_URI,
+    code_challenge_method: 'S256',
+    code_challenge: codeChallenge,
+  });
 
-  window.location.href = authUrl.toString();
-}
+  window.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+};
 
-export async function exchangeToken(code) {
+export const exchangeToken = async (code) => {
   const codeVerifier = localStorage.getItem('spotify_code_verifier');
-  if (!codeVerifier) throw new Error('Code verifier not found');
+  if (!codeVerifier) throw new Error('Missing code verifier');
 
   const body = new URLSearchParams({
-    client_id: CLIENT_ID,
     grant_type: 'authorization_code',
     code,
     redirect_uri: REDIRECT_URI,
+    client_id: SPOTIFY_CLIENT_ID,
     code_verifier: codeVerifier,
   });
 
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
+    body: body.toString(),
   });
 
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error_description || 'Token exchange failed');
 
-  const now = Date.now();
-  const expiresAt = now + data.expires_in * 1000;
+  if (data.access_token) {
+    storeToken(data);
+  }
 
-  localStorage.setItem('spotify_access_token', data.access_token);
-  localStorage.setItem('spotify_token_expiry', expiresAt.toString());
+  return data;
+};
 
-  return data.access_token;
-}
+export const storeToken = (data) => {
+  const expiryTime = Date.now() + data.expires_in * 1000;
+  localStorage.setItem('spotify_token', data.access_token);
+  localStorage.setItem('spotify_token_expiry', expiryTime);
+};
 
-export function getStoredToken() {
-  const token = localStorage.getItem('spotify_access_token');
-  const expiry = parseInt(localStorage.getItem('spotify_token_expiry'), 10);
-  if (!token || !expiry || Date.now() > expiry) return null;
+export const getStoredToken = () => {
+  const token = localStorage.getItem('spotify_token');
+  const expiry = localStorage.getItem('spotify_token_expiry');
+  if (!token || !expiry || Date.now() > Number(expiry)) {
+    return null;
+  }
   return token;
-}
-
-export function storeToken(token, expiresIn) {
-  const expiresAt = Date.now() + expiresIn * 1000;
-  localStorage.setItem('spotify_access_token', token);
-  localStorage.setItem('spotify_token_expiry', expiresAt.toString());
-}
-
-// ✅ Export the missing function
-export function isTokenExpired() {
-  const expiry = parseInt(localStorage.getItem('spotify_token_expiry'), 10);
-  return !expiry || Date.now() > expiry;
-}
+};
