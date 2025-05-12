@@ -1,38 +1,31 @@
 // src/pages/CallbackPage.js
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { exchangeToken } from '../api/spotify/token';
 import { setAccessToken } from '../api/spotify/api';
 
 const CallbackPage = () => {
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get('code');
-    console.log('[CallbackPage] Code from URL:', code);
+    const handleAuth = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      console.log('[CallbackPage] Code from URL:', code);
 
-    if (!code) {
-      console.error('[CallbackPage] No code found in URL');
-      navigate('/error');
-      return;
-    }
+      if (code) {
+        try {
+          const token = await exchangeToken(code);
+          setAccessToken(token.access_token);
+          window.location.href = '/music'; // Refresh app with new token
+        } catch (err) {
+          console.error('[CallbackPage] Token exchange failed:', err);
+          window.location.href = '/error';
+        }
+      }
+    };
 
-    exchangeToken(code)
-      .then(token => {
-        setAccessToken(token);
-        navigate('/music');
-      })
-      .catch(err => {
-        console.error('[CallbackPage] Token exchange failed:', err);
-        navigate('/error');
-      });
-  }, [navigate]);
+    handleAuth();
+  }, []);
 
-  return (
-    <div className="p-4 text-center text-gray-600">
-      Authenticating with Spotify...
-    </div>
-  );
+  return <div className="text-white text-center mt-10">Processing authentication...</div>;
 };
 
 export default CallbackPage;

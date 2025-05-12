@@ -1,4 +1,4 @@
-// src/pages/LoginPage.js
+// src/pages/HomePage.js
 import { redirectToSpotifyAuth } from '../api/spotify/token';
 
 const HomePage = () => {

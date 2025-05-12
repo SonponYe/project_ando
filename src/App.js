@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { getStoredToken } from './api/spotify/token';
 import { setAccessToken } from './api/spotify/api';
 
-import LoginPage from './pages/HomePage';
+import HomePage from './pages/HomePage';
 import CallbackPage from './pages/CallbackPage';
 import MusicPage from './pages/MusicPage';
 import FavoritesPage from './pages/FavoritesPage';
@@ -26,7 +26,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/music" /> : <LoginPage />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/music" /> : <HomePage />} />
         <Route path="/callback" element={<CallbackPage />} />
         <Route path="/music" element={isAuthenticated ? <MusicPage /> : <Navigate to="/" />} />
         <Route path="/favorites" element={isAuthenticated ? <FavoritesPage /> : <Navigate to="/" />} />
