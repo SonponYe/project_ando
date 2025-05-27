@@ -1,9 +1,7 @@
 // src/api/spotify/token.js
-
-const SPOTIFY_CLIENT_ID = 'e7046a4937da4182b586c352a0c66d3d';
+const SPOTIFY_CLIENT_ID = 'e7046a4937da4182b586c352a0c66d3d'; // Replace with your real one
 const REDIRECT_URI = 'https://ando-ten.vercel.app/callback';
-
-const scopes = [
+const SCOPES = [
   'user-read-private',
   'user-read-email',
   'user-library-read',
@@ -41,7 +39,7 @@ export const redirectToSpotifyAuth = async () => {
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: SPOTIFY_CLIENT_ID,
-    scope: scopes.join(' '),
+    scope: SCOPES.join(' '),
     redirect_uri: REDIRECT_URI,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
@@ -68,19 +66,19 @@ export const exchangeToken = async (code) => {
     body: body.toString(),
   });
 
-  const data = await response.json();
-
-  if (data.access_token) {
-    storeToken(data);
+  if (!response.ok) {
+    throw new Error('Failed to exchange code for token');
   }
 
-  return data;
+  const data = await response.json();
+  return storeToken(data);
 };
 
 export const storeToken = (data) => {
   const expiryTime = Date.now() + data.expires_in * 1000;
   localStorage.setItem('spotify_token', data.access_token);
   localStorage.setItem('spotify_token_expiry', expiryTime);
+  return data.access_token;
 };
 
 export const getStoredToken = () => {
@@ -90,4 +88,10 @@ export const getStoredToken = () => {
     return null;
   }
   return token;
+};
+
+export const clearToken = () => {
+  localStorage.removeItem('spotify_token');
+  localStorage.removeItem('spotify_token_expiry');
+  localStorage.removeItem('spotify_code_verifier');
 };

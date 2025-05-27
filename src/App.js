@@ -2,7 +2,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { getStoredToken } from './api/spotify/token';
-import { setAccessToken } from './api/spotify/api';
 
 import HomePage from './pages/HomePage';
 import CallbackPage from './pages/CallbackPage';
@@ -11,16 +10,6 @@ import FavoritesPage from './pages/FavoritesPage';
 import ErrorPage from './pages/ErrorPage';
 
 function App() {
-  useEffect(() => {
-    const token = getStoredToken();
-    if (token) {
-      console.log('[App] Setting stored access token');
-      setAccessToken(token);
-    } else {
-      console.log('[App] No token found in localStorage');
-    }
-  }, []);
-
   const isAuthenticated = !!getStoredToken();
 
   return (
