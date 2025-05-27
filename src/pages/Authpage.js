@@ -1,10 +1,10 @@
 // src/pages/AuthPage.js
 import React from "react";
-import { redirectToSpotifyAuth } from "../api/spotify/token";
+import { initiateAuthFlow } from "../api/spotify/token";
 
 const AuthPage = () => {
   const handleLogin = async () => {
-    await redirectToSpotifyAuth();
+    await initiateAuthFlow();
   };
 
   return (

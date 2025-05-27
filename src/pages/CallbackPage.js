@@ -1,15 +1,14 @@
 // src/pages/CallbackPage.js
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { exchangeToken } from '../api/spotify/token';
+import { handleTokenExchange } from '../api/spotify/token';
 
 export default function CallbackPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const code = params.get('code');
+    const code = new URLSearchParams(location.search).get('code');
     const error = params.get('error');
 
     if (error) {
@@ -26,7 +25,7 @@ export default function CallbackPage() {
 
     const handleAuth = async () => {
       try {
-        await exchangeToken(code);
+        await handleTokenExchange(code);
         navigate('/');
       } catch (err) {
         console.error('Failed to exchange code for token:', err);
