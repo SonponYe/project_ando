@@ -1,8 +1,8 @@
-// src/pages/AuthPage.js
-import React from "react";
-import { initiateAuthFlow } from "../api/spotify/token";
+// src/pages/HomePage.js (or AuthPage.js)
+import React from 'react';
+import { initiateAuthFlow } from '../api/spotify/token';
 
-const AuthPage = () => {
+const HomePage = () => {
   const handleLogin = async () => {
     await initiateAuthFlow();
   };
@@ -23,4 +23,4 @@ const AuthPage = () => {
   );
 };
 
-export default AuthPage;
+export default HomePage;

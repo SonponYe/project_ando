@@ -8,8 +8,9 @@ export default function CallbackPage() {
   const location = useLocation();
 
   useEffect(() => {
-    const code = new URLSearchParams(location.search).get('code');
-    const error = params.get('error');
+    const searchParams = new URLSearchParams(location.search);
+    const code = searchParams.get('code');
+    const error = searchParams.get('error');
 
     if (error) {
       console.error('Spotify auth error:', error);

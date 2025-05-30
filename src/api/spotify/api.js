@@ -1,9 +1,9 @@
 // src/api/spotify/api.js
 import axios from 'axios';
-import { getStoredToken } from './token';
+import { retrieveValidToken } from './token';
 
 const getHeaders = () => {
-  const token = getStoredToken();
+  const token = retrieveValidToken();
   if (!token) {
     console.warn('[Spotify API] No access token set!');
     return {};
@@ -60,5 +60,4 @@ export const getSavedTracks = async () => {
   }
 };
 
-// Alias for convenience
 export const searchTracks = fetchTracksBySearch;

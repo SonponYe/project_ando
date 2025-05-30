@@ -1,20 +1,23 @@
-// src/pages/HomePage.js
-import { redirectToSpotifyAuth } from '../api/spotify/token';
+// src/pages/HomePage.js (or AuthPage.js)
+import React from 'react';
+import { initiateAuthFlow } from '../api/spotify/token';
 
 const HomePage = () => {
-  const handleLogin = () => {
-    redirectToSpotifyAuth();
+  const handleLogin = async () => {
+    await initiateAuthFlow();
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-400 to-black text-white">
-      <h1 className="text-4xl font-bold mb-6">Welcome to Ando</h1>
-      <p className="mb-4 text-lg">Stream music by mood or genre.</p>
+    <div className="flex flex-col items-center justify-center min-h-screen text-center">
+      <h1 className="text-4xl font-bold mb-4">Welcome to Ando 🎵</h1>
+      <p className="mb-6 text-gray-600">
+        Discover music by mood, genre, or search — no account setup needed.
+      </p>
       <button
         onClick={handleLogin}
-        className="px-6 py-3 bg-white text-black rounded-full hover:bg-gray-200 transition"
+        className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
       >
-        Connect with Spotify
+        Start Listening
       </button>
     </div>
   );
