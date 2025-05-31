@@ -7,19 +7,21 @@ const Player = () => {
   if (!currentTrack) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: '#1f2937',
-      color: 'white',
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0.5rem 1rem',
-      gap: '1rem',
-      zIndex: 10000,
-    }}>
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#1f2937',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0.5rem 1rem',
+        gap: '1rem',
+        zIndex: 10000,
+      }}
+    >
       <img
         src={currentTrack.album?.images?.[0]?.url}
         alt={currentTrack.name}
@@ -32,9 +34,13 @@ const Player = () => {
         </div>
       </div>
       {isPlaying ? (
-        <button onClick={pause} style={buttonStyle}>Pause</button>
+        <button onClick={pause} style={buttonStyle}>
+          Pause
+        </button>
       ) : (
-        <button onClick={() => playTrack(currentTrack)} style={buttonStyle}>Play</button>
+        <button onClick={() => playTrack(currentTrack)} style={buttonStyle}>
+          Play
+        </button>
       )}
     </div>
   );

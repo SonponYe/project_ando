@@ -7,48 +7,54 @@ export const PlaybackProvider = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Play a new track
+  // Play a new track or toggle play/pause if same track
   const playTrack = (track) => {
-    if (!track?.preview_url) return;
+    console.log('Attempting to play track:', track.name, track.preview_url);
+    if (!track?.preview_url) {
+      console.warn('No preview URL available for this track.');
+      return;
+    }
+
     if (currentTrack?.id !== track.id) {
       setCurrentTrack(track);
       audioRef.current.src = track.preview_url;
-      audioRef.current.play();
+      audioRef.current.play().catch((error) => {
+        console.warn('Playback failed:', error);
+      });
       setIsPlaying(true);
     } else {
-      // If same track, toggle play/pause
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
       } else {
-        audioRef.current.play();
+        audioRef.current.play().catch((error) => {
+          console.warn('Playback failed:', error);
+        });
         setIsPlaying(true);
       }
     }
   };
 
-  // Pause playback
   const pause = () => {
     audioRef.current.pause();
     setIsPlaying(false);
   };
 
-  // Play playback
   const play = () => {
-    audioRef.current.play();
+    audioRef.current.play().catch((error) => {
+      console.warn('Playback failed:', error);
+    });
     setIsPlaying(true);
   };
 
-  // When track ends, reset playing state
   useEffect(() => {
-    const audio = audioRef.current;  // capture current ref
+    const audio = audioRef.current;
     const handleEnded = () => setIsPlaying(false);
     audio.addEventListener('ended', handleEnded);
     return () => {
       audio.removeEventListener('ended', handleEnded);
     };
   }, []);
-  
 
   return (
     <PlaybackContext.Provider
