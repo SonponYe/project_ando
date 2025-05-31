@@ -73,3 +73,40 @@ export const fetchUserProfile = async () => {
     return null;
   }
 };
+
+
+
+// Save a track to user's favorites
+export const saveTrackToFavorites = async (trackId) => {
+  try {
+    // Spotify API expects an array of track IDs
+    await axios.put(
+      `https://api.spotify.com/v1/me/tracks?ids=${trackId}`,
+      null,
+      {
+        headers: getHeaders(),
+      }
+    );
+    return true;
+  } catch (error) {
+    console.error('[Spotify API] saveTrackToFavorites error:', error);
+    return false;
+  }
+};
+
+// Remove a track from user's favorites
+export const removeTrackFromFavorites = async (trackId) => {
+  try {
+    // Spotify API expects an array of track IDs
+    await axios.delete(
+      `https://api.spotify.com/v1/me/tracks?ids=${trackId}`,
+      {
+        headers: getHeaders(),
+      }
+    );
+    return true;
+  } catch (error) {
+    console.error('[Spotify API] removeTrackFromFavorites error:', error);
+    return false;
+  }
+};
