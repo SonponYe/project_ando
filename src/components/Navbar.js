@@ -1,17 +1,34 @@
-// src/components/Navbar.js
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 const Navbar = () => {
+  const activeStyle = {
+    fontWeight: 'bold',
+    color: '#4F46E5', // Indigo color for active link
+  };
+
   return (
-    <nav className="bg-black text-white p-4 flex justify-between items-center shadow-md">
-      <Link to="/" className="text-xl font-bold tracking-wide">
-        Ando 🎶
-      </Link>
-      <div className="space-x-4">
-        <Link to="/" className="hover:text-green-400">Home</Link>
-        <Link to="/favorites" className="hover:text-green-400">Favorites</Link>
-      </div>
+    <nav
+      style={{
+        display: 'flex',
+        gap: '1.5rem',
+        padding: '1rem 2rem',
+        borderBottom: '1px solid #ccc',
+        backgroundColor: '#f9f9f9',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+      }}
+    >
+      <NavLink to="/music" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+        Music
+      </NavLink>
+      <NavLink to="/favorites" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+        Favorites
+      </NavLink>
+      <NavLink to="/error" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+        Error
+      </NavLink>
     </nav>
   );
 };

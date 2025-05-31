@@ -1,11 +1,12 @@
-// src/pages/MusicListPage.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { PlaybackContext } from '../context/PlaybackContext';
 
 const MusicListPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const tracks = location.state?.tracks || [];
+  const { playTrack, currentTrack, isPlaying } = useContext(PlaybackContext);
 
   if (!tracks.length) {
     return (
@@ -33,37 +34,45 @@ const MusicListPage = () => {
     <div style={{ padding: '2rem', maxWidth: '800px', margin: 'auto' }}>
       <h1>🎶 Search Results</h1>
       <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
-        {tracks.map((track) => (
-          <div
-            key={track.id}
-            style={{
-              border: '1px solid #ccc',
-              padding: '1rem',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-            }}
-          >
-            {track.album?.images?.[0]?.url && (
-              <img
-                src={track.album.images[0].url}
-                alt={track.name}
-                style={{ width: 64, height: 64, borderRadius: '8px' }}
-              />
-            )}
-            <div style={{ flex: 1 }}>
-              <strong>{track.name}</strong>
-              <br />
-              <em>{track.artists.map((a) => a.name).join(', ')}</em>
-              <br />
-              <small>{track.album?.name}</small>
+        {tracks.map((track) => {
+          const isCurrent = currentTrack?.id === track.id && isPlaying;
+          return (
+            <div
+              key={track.id}
+              onClick={() => playTrack(track)}
+              style={{
+                border: '1px solid #ccc',
+                padding: '1rem',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                cursor: 'pointer',
+                backgroundColor: isCurrent ? '#e0e7ff' : 'white',
+              }}
+              title="Click to play/pause"
+            >
+              {track.album?.images?.[0]?.url && (
+                <img
+                  src={track.album.images[0].url}
+                  alt={track.name}
+                  style={{ width: 64, height: 64, borderRadius: '8px' }}
+                />
+              )}
+              <div style={{ flex: 1 }}>
+                <strong>{track.name}</strong>
+                <br />
+                <em>{track.artists.map((a) => a.name).join(', ')}</em>
+                <br />
+                <small>{track.album?.name}</small>
+              </div>
+              {/* Optional: Show play/pause icon */}
+              <div style={{ fontWeight: 'bold', color: '#4F46E5' }}>
+                {isCurrent ? '▶️ Playing' : '▶️ Play'}
+              </div>
             </div>
-            {track.preview_url && (
-              <audio controls src={track.preview_url} style={{ width: 150 }} />
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
