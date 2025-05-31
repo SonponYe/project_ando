@@ -26,8 +26,8 @@ const Navbar = () => {
       <NavLink to="/favorites" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
         Favorites
       </NavLink>
-      <NavLink to="/error" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
-        Error
+      <NavLink to="/profile" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+        Profile
       </NavLink>
     </nav>
   );

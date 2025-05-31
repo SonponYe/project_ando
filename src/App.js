@@ -4,6 +4,7 @@ import { retrieveValidToken } from './api/spotify/token';
 
 import { PlaybackProvider } from './context/PlaybackContext';
 import Player from './components/Player';
+import ProfilePage from './pages/ProfilePage';
 
 import HomePage from './pages/HomePage';
 import CallbackPage from './pages/CallbackPage';
@@ -28,6 +29,7 @@ function App() {
           <Route path="/favorites" element={isAuthenticated ? <FavoritesPage /> : <Navigate to="/" />} />
           <Route path="/error" element={<ErrorPage />} />
           <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate to="/" />} />
         </Routes>
         {isAuthenticated && <Player />} {/* Render Player when authenticated */}
       </Router>

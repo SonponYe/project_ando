@@ -8,10 +8,13 @@ const HomePage = () => {
   };
 
   return (
+    
     <div className="flex flex-col items-center justify-center min-h-screen text-center">
       <h1 className="text-4xl font-bold mb-4">Welcome to Ando 🎵</h1>
       <p className="mb-6 text-gray-600">
         Discover music by mood, genre, or search — no account setup needed.
+        console.log('Rendering HomePage');
+
       </p>
       <button
         onClick={handleLogin}

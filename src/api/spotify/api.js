@@ -61,3 +61,15 @@ export const getSavedTracks = async () => {
 };
 
 export const searchTracks = fetchTracksBySearch;
+
+export const fetchUserProfile = async () => {
+  try {
+    const res = await axios.get('https://api.spotify.com/v1/me', {
+      headers: getHeaders(),
+    });
+    return res.data;
+  } catch (err) {
+    console.error('[Spotify API] Fetch User Profile failed:', err);
+    return null;
+  }
+};
