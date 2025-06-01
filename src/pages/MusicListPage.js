@@ -1,13 +1,13 @@
 import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PlaybackContext } from '../context/PlaybackContext';
-import { FavoritesContext } from '../context/FavoritesContext'; // Assuming you have this context
+import { FavoritesContext } from '../context/FavoritesContext';
 
 const MusicListPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const tracks = location.state?.tracks || [];
-  const { playTrack, currentTrack, isPlaying } = useContext(PlaybackContext);
+  const { playTrack, pause, currentTrack, isPlaying } = useContext(PlaybackContext);
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
 
   if (!tracks.length) {
@@ -69,9 +69,9 @@ const MusicListPage = () => {
                 <small>{track.album?.name}</small>
               </div>
 
-              {/* Dedicated Play Button */}
+              {/* Play/Pause Button */}
               <button
-                onClick={() => playTrack(track)}
+                onClick={() => (isCurrent ? pause() : playTrack(track))}
                 disabled={!track.preview_url}
                 style={{
                   backgroundColor: isCurrent ? '#2563eb' : '#4F46E5',
@@ -81,9 +81,9 @@ const MusicListPage = () => {
                   borderRadius: '4px',
                   cursor: track.preview_url ? 'pointer' : 'not-allowed',
                 }}
-                aria-label={track.preview_url ? `Play ${track.name}` : 'Preview not available'}
+                aria-label={track.preview_url ? `${isCurrent ? 'Pause' : 'Play'} ${track.name}` : 'Preview not available'}
               >
-                {isCurrent && isPlaying ? 'Pause' : 'Play'}
+                {isCurrent ? 'Pause' : 'Play'}
               </button>
 
               {/* Favorite Toggle Button */}

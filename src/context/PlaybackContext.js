@@ -7,7 +7,6 @@ export const PlaybackProvider = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Play a new track or toggle play/pause if same track
   const playTrack = (track) => {
     console.log('Attempting to play track:', track.name, track.preview_url);
     if (!track?.preview_url) {
@@ -18,10 +17,17 @@ export const PlaybackProvider = ({ children }) => {
     if (currentTrack?.id !== track.id) {
       setCurrentTrack(track);
       audioRef.current.src = track.preview_url;
-      audioRef.current.play().catch((error) => {
-        console.warn('Playback failed:', error);
-      });
-      setIsPlaying(true);
+      audioRef.current.load();
+
+      const playAudio = () => {
+        audioRef.current.play().catch((error) => {
+          console.warn('Playback failed:', error);
+        });
+        setIsPlaying(true);
+      };
+
+      // Play once audio can play
+      audioRef.current.addEventListener('canplay', playAudio, { once: true });
     } else {
       if (isPlaying) {
         audioRef.current.pause();
