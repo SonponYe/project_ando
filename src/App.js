@@ -13,12 +13,13 @@ import MusicListPage from './pages/MusicListPage';
 import FavoritesPage from './pages/FavoritesPage';
 import ErrorPage from './pages/ErrorPage';
 import Navbar from './components/Navbar';
-
+import { FavoritesProvider } from './context/FavoritesContext';
 function App() {
   const isAuthenticated = !!retrieveValidToken();
 
   return (
     <PlaybackProvider>
+      <FavoritesProvider> 
       <Router>
         {isAuthenticated && <Navbar />}
         <Routes>
@@ -33,6 +34,7 @@ function App() {
         </Routes>
         {isAuthenticated && <Player />} {/* Render Player when authenticated */}
       </Router>
+      </FavoritesProvider>
     </PlaybackProvider>
   );
 }
