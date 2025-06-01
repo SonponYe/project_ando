@@ -81,7 +81,11 @@ const MusicListPage = () => {
                   borderRadius: '4px',
                   cursor: track.preview_url ? 'pointer' : 'not-allowed',
                 }}
-                aria-label={track.preview_url ? `${isCurrent ? 'Pause' : 'Play'} ${track.name}` : 'Preview not available'}
+                aria-label={
+                  track.preview_url
+                    ? `${isCurrent ? 'Pause' : 'Play'} ${track.name}`
+                    : 'Preview not available'
+                }
               >
                 {isCurrent ? 'Pause' : 'Play'}
               </button>
@@ -98,7 +102,11 @@ const MusicListPage = () => {
                   cursor: 'pointer',
                 }}
                 aria-pressed={favorite}
-                aria-label={favorite ? `Remove ${track.name} from favorites` : `Add ${track.name} to favorites`}
+                aria-label={
+                  favorite
+                    ? `Remove ${track.name} from favorites`
+                    : `Add ${track.name} to favorites`
+                }
               >
                 {favorite ? '♥' : '♡'}
               </button>

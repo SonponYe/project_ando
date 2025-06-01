@@ -7,8 +7,8 @@ export const PlaybackProvider = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Play or toggle track
   const playTrack = (track) => {
-    console.log('Attempting to play track:', track.name, track.preview_url);
     if (!track?.preview_url) {
       console.warn('No preview URL available for this track.');
       return;
@@ -16,18 +16,6 @@ export const PlaybackProvider = ({ children }) => {
 
     if (currentTrack?.id !== track.id) {
       setCurrentTrack(track);
-      audioRef.current.src = track.preview_url;
-      audioRef.current.load();
-
-      const playAudio = () => {
-        audioRef.current.play().catch((error) => {
-          console.warn('Playback failed:', error);
-        });
-        setIsPlaying(true);
-      };
-
-      // Play once audio can play
-      audioRef.current.addEventListener('canplay', playAudio, { once: true });
     } else {
       if (isPlaying) {
         audioRef.current.pause();
@@ -41,31 +29,43 @@ export const PlaybackProvider = ({ children }) => {
     }
   };
 
+  // Effect to handle track change and playback
+  useEffect(() => {
+    if (!currentTrack) return;
+
+    audioRef.current.src = currentTrack.preview_url;
+    audioRef.current.load();
+
+    const onCanPlay = () => {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch((error) => {
+          console.warn('Playback failed:', error);
+          setIsPlaying(false);
+        });
+    };
+
+    const onEnded = () => setIsPlaying(false);
+
+    audioRef.current.addEventListener('canplay', onCanPlay, { once: true });
+    audioRef.current.addEventListener('ended', onEnded);
+
+    // Cleanup listeners on unmount or track change
+    return () => {
+      audioRef.current.pause();
+      audioRef.current.removeEventListener('canplay', onCanPlay);
+      audioRef.current.removeEventListener('ended', onEnded);
+    };
+  }, [currentTrack]);
+
+  // Pause playback manually
   const pause = () => {
     audioRef.current.pause();
     setIsPlaying(false);
   };
 
-  const play = () => {
-    audioRef.current.play().catch((error) => {
-      console.warn('Playback failed:', error);
-    });
-    setIsPlaying(true);
-  };
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    const handleEnded = () => setIsPlaying(false);
-    audio.addEventListener('ended', handleEnded);
-    return () => {
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, []);
-
   return (
-    <PlaybackContext.Provider
-      value={{ currentTrack, isPlaying, playTrack, pause, play }}
-    >
+    <PlaybackContext.Provider value={{ currentTrack, isPlaying, playTrack, pause }}>
       {children}
     </PlaybackContext.Provider>
   );
