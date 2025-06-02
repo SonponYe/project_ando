@@ -2,7 +2,15 @@
 
 /* Base styles and reddish background */
 .whole.profile {
-    background: #8b0000; /* Dark red */
+    /* Replace solid color with a smooth linear gradient */
+    background: linear-gradient(
+      135deg, 
+      #8b0000 0%,     /* Dark Red */
+      #b22222 40%,    /* Firebrick */
+      #cd5c5c 75%,    /* Indian Red */
+      #f08080 100%    /* Light Coral */
+    );
+    
     min-height: 100vh;
     padding: 2rem 1rem;
     box-sizing: border-box;
@@ -13,6 +21,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
   }
+  
   
   /* Profile image */
   .profile.image {
