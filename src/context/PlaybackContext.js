@@ -33,11 +33,13 @@ export const PlaybackProvider = ({ children }) => {
   useEffect(() => {
     if (!currentTrack) return;
 
-    audioRef.current.src = currentTrack.preview_url;
-    audioRef.current.load();
+    const audio = audioRef.current; // copy ref to local variable
+
+    audio.src = currentTrack.preview_url;
+    audio.load();
 
     const onCanPlay = () => {
-      audioRef.current.play()
+      audio.play()
         .then(() => setIsPlaying(true))
         .catch((error) => {
           console.warn('Playback failed:', error);
@@ -47,14 +49,14 @@ export const PlaybackProvider = ({ children }) => {
 
     const onEnded = () => setIsPlaying(false);
 
-    audioRef.current.addEventListener('canplay', onCanPlay, { once: true });
-    audioRef.current.addEventListener('ended', onEnded);
+    audio.addEventListener('canplay', onCanPlay, { once: true });
+    audio.addEventListener('ended', onEnded);
 
     // Cleanup listeners on unmount or track change
     return () => {
-      audioRef.current.pause();
-      audioRef.current.removeEventListener('canplay', onCanPlay);
-      audioRef.current.removeEventListener('ended', onEnded);
+      audio.pause();
+      audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('ended', onEnded);
     };
   }, [currentTrack]);
 
