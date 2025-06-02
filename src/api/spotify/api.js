@@ -93,6 +93,21 @@ export const saveTrackToFavorites = async (trackId) => {
     return false;
   }
 };
+export async function fetchRecentlyPlayed() {
+  const token = /* your logic to get access token */;
+  const response = await fetch('https://api.spotify.com/v1/me/player/recently-played', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch recently played tracks');
+  }
+
+  return response.json();
+}
+
 
 // Remove a track from user's favorites
 export const removeTrackFromFavorites = async (trackId) => {
@@ -110,3 +125,4 @@ export const removeTrackFromFavorites = async (trackId) => {
     return false;
   }
 };
+

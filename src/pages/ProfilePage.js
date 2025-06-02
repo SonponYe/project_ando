@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUserProfile, fetchRecentlyPlayed } from '../api/spotify/api';
-import profile from './profile.css';
+import './profile.css';
+
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [recentTracks, setRecentTracks] = useState([]);
