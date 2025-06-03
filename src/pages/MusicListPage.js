@@ -2,32 +2,20 @@ import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
+import AudioPlayer from '../components/AudioPlayer';
 
 const MusicListPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const tracks = location.state?.tracks || [];
-  const { playTrack, pause, currentTrack, isPlaying } = useContext(PlaybackContext);
+  const { currentTrack, setCurrentTrack } = useContext(PlaybackContext);
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
 
   if (!tracks.length) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
         <h2>No tracks found.</h2>
-        <button
-          onClick={() => navigate('/music')}
-          style={{
-            marginTop: '1rem',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '8px',
-            border: 'none',
-            backgroundColor: '#4F46E5',
-            color: 'white',
-            cursor: 'pointer',
-          }}
-        >
-          Back to Search
-        </button>
+        <button onClick={() => navigate('/music')}>Back to Search</button>
       </div>
     );
   }
@@ -37,7 +25,7 @@ const MusicListPage = () => {
       <h1>🎶 Search Results</h1>
       <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
         {tracks.map((track) => {
-          const isCurrent = currentTrack?.id === track.id && isPlaying;
+          const isCurrent = currentTrack?.id === track.id;
           const favorite = isFavorite(track.id);
 
           return (
@@ -51,7 +39,6 @@ const MusicListPage = () => {
                 alignItems: 'center',
                 gap: '1rem',
                 backgroundColor: isCurrent ? '#e0e7ff' : 'white',
-                userSelect: 'none',
               }}
             >
               {track.album?.images?.[0]?.url && (
@@ -69,9 +56,8 @@ const MusicListPage = () => {
                 <small>{track.album?.name}</small>
               </div>
 
-              {/* Play/Pause Button */}
               <button
-                onClick={() => (isCurrent ? pause() : playTrack(track))}
+                onClick={() => setCurrentTrack(track)}
                 disabled={!track.preview_url}
                 style={{
                   backgroundColor: isCurrent ? '#2563eb' : '#4F46E5',
@@ -83,14 +69,13 @@ const MusicListPage = () => {
                 }}
                 aria-label={
                   track.preview_url
-                    ? `${isCurrent ? 'Pause' : 'Play'} ${track.name}`
+                    ? `${isCurrent ? 'Playing' : 'Play'} ${track.name}`
                     : 'Preview not available'
                 }
               >
-                {isCurrent ? 'Pause' : 'Play'}
+                {isCurrent ? 'Playing' : 'Play'}
               </button>
 
-              {/* Favorite Toggle Button */}
               <button
                 onClick={() => toggleFavorite(track)}
                 style={{
@@ -114,6 +99,9 @@ const MusicListPage = () => {
           );
         })}
       </div>
+
+      {/* Place AudioPlayer at bottom */}
+      <AudioPlayer track={currentTrack} />
     </div>
   );
 };

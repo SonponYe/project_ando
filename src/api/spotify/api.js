@@ -74,8 +74,6 @@ export const fetchUserProfile = async () => {
   }
 };
 
-
-
 // Save a track to user's favorites
 export const saveTrackToFavorites = async (trackId) => {
   try {
@@ -94,6 +92,19 @@ export const saveTrackToFavorites = async (trackId) => {
   }
 };
 
+// Fetch recently played tracks (fixed)
+export const fetchRecentlyPlayed = async () => {
+  try {
+    const res = await axios.get('https://api.spotify.com/v1/me/player/recently-played', {
+      headers: getHeaders(),
+      params: { limit: 10 },
+    });
+    return res.data;
+  } catch (err) {
+    handleError(err, 'Recently Played');
+    return { items: [] };
+  }
+};
 
 // Remove a track from user's favorites
 export const removeTrackFromFavorites = async (trackId) => {
@@ -109,18 +120,5 @@ export const removeTrackFromFavorites = async (trackId) => {
   } catch (error) {
     console.error('[Spotify API] removeTrackFromFavorites error:', error);
     return false;
-  }
-};
-
-export const fetchRecentlyPlayed = async () => {
-  try {
-    const res = await axios.get('https://api.spotify.com/v1/me/player/recently-played', {
-      headers: getHeaders(),
-      params: { limit: 5 }, // optional: limit number of items
-    });
-    return res.data;
-  } catch (err) {
-    handleError(err, 'Recently Played');
-    return { items: [] }; // return empty structure for safety
   }
 };

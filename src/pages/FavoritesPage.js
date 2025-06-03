@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
+import AudioPlayer from '../components/AudioPlayer';
 
 const FavoritesPage = () => {
   const { favorites, toggleFavorite } = useContext(FavoritesContext);
-  const { playTrack, pause, currentTrack, isPlaying } = useContext(PlaybackContext);
+  const { currentTrack, setCurrentTrack } = useContext(PlaybackContext);
 
   if (!favorites.length) {
     return <p style={{ padding: '2rem', textAlign: 'center' }}>No favorite tracks found.</p>;
@@ -15,7 +16,7 @@ const FavoritesPage = () => {
       <h1>❤️ Your Favorites</h1>
       <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
         {favorites.map((track) => {
-          const isCurrent = currentTrack?.id === track.id && isPlaying;
+          const isCurrent = currentTrack?.id === track.id;
 
           return (
             <div
@@ -28,7 +29,6 @@ const FavoritesPage = () => {
                 alignItems: 'center',
                 gap: '1rem',
                 backgroundColor: isCurrent ? '#e0e7ff' : 'white',
-                userSelect: 'none',
               }}
             >
               {track.album?.images?.[0]?.url ? (
@@ -62,9 +62,8 @@ const FavoritesPage = () => {
                 <small>{track.album?.name}</small>
               </div>
 
-              {/* Play/Pause Button */}
               <button
-                onClick={() => (isCurrent ? pause() : playTrack(track))}
+                onClick={() => setCurrentTrack(track)}
                 disabled={!track.preview_url}
                 style={{
                   backgroundColor: isCurrent ? '#2563eb' : '#4F46E5',
@@ -76,14 +75,13 @@ const FavoritesPage = () => {
                 }}
                 aria-label={
                   track.preview_url
-                    ? `${isCurrent ? 'Pause' : 'Play'} ${track.name}`
+                    ? `${isCurrent ? 'Playing' : 'Play'} ${track.name}`
                     : 'Preview not available'
                 }
               >
-                {isCurrent ? 'Pause' : 'Play'}
+                {isCurrent ? 'Playing' : 'Play'}
               </button>
 
-              {/* Remove from Favorites Button */}
               <button
                 onClick={() => toggleFavorite(track)}
                 style={{
@@ -103,6 +101,9 @@ const FavoritesPage = () => {
           );
         })}
       </div>
+
+      {/* Place AudioPlayer at bottom */}
+      <AudioPlayer track={currentTrack} />
     </div>
   );
 };
