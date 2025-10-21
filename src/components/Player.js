@@ -13,33 +13,56 @@ const Player = () => {
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#1f2937',
-        color: 'white',
+        backgroundColor: '#ffffff',
+        color: '#111827',
         display: 'flex',
         alignItems: 'center',
-        padding: '0.5rem 1rem',
-        gap: '1rem',
+        padding: '1rem 1.5rem',
+        gap: '1.25rem',
         zIndex: 10000,
+        boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.1)',
+        backdropFilter: 'blur(10px)',
+        borderTop: '1px solid #e5e7eb',
       }}
     >
       <img
         src={currentTrack.album?.images?.[0]?.url}
         alt={currentTrack.name}
-        style={{ width: 50, height: 50, borderRadius: 4 }}
+        style={{ 
+          width: 56, 
+          height: 56, 
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+        }}
       />
-      <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: 'bold' }}>{currentTrack.name}</div>
-        <div style={{ fontSize: '0.9rem', color: '#d1d5db' }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ 
+          fontWeight: '700', 
+          fontSize: '0.95rem',
+          marginBottom: '0.25rem',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {currentTrack.name}
+        </div>
+        <div style={{ 
+          fontSize: '0.85rem', 
+          color: '#6b7280',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
           {currentTrack.artists.map((a) => a.name).join(', ')}
         </div>
       </div>
       {isPlaying ? (
         <button onClick={pause} style={buttonStyle}>
-          Pause
+          ⏸ Pause
         </button>
       ) : (
         <button onClick={() => playTrack(currentTrack)} style={buttonStyle}>
-          Play
+          ▶ Play
         </button>
       )}
     </div>
@@ -47,12 +70,17 @@ const Player = () => {
 };
 
 const buttonStyle = {
-  backgroundColor: '#4F46E5',
+  background: 'linear-gradient(135deg, #6366f1, #818cf8)',
   border: 'none',
   color: 'white',
-  padding: '0.5rem 1rem',
-  borderRadius: '4px',
+  padding: '0.625rem 1.25rem',
+  borderRadius: '10px',
   cursor: 'pointer',
+  fontWeight: '600',
+  fontSize: '0.9rem',
+  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  letterSpacing: '0.3px',
 };
 
 export default Player;

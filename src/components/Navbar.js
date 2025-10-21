@@ -3,30 +3,61 @@ import { NavLink } from 'react-router-dom';
 
 const Navbar = () => {
   const activeStyle = {
-    fontWeight: 'bold',
-    color: '#4F46E5', // Indigo color for active link
+    fontWeight: '700',
+    color: '#6366f1',
+    borderBottom: '3px solid #6366f1',
+  };
+
+  const navStyle = {
+    display: 'flex',
+    gap: '2rem',
+    padding: '1rem 2rem',
+    borderBottom: '1px solid #e5e7eb',
+    backgroundColor: '#ffffff',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
+    backdropFilter: 'blur(10px)',
+  };
+
+  const linkStyle = {
+    padding: '0.5rem 0',
+    color: '#6b7280',
+    fontWeight: '500',
+    fontSize: '0.95rem',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    borderBottom: '3px solid transparent',
+    letterSpacing: '0.3px',
   };
 
   return (
-    <nav
-      style={{
-        display: 'flex',
-        gap: '1.5rem',
-        padding: '1rem 2rem',
-        borderBottom: '1px solid #ccc',
-        backgroundColor: '#f9f9f9',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
-      }}
-    >
-      <NavLink to="/music" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+    <nav style={navStyle}>
+      <NavLink 
+        to="/music" 
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
+      >
         Music
       </NavLink>
-      <NavLink to="/favorites" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+      <NavLink 
+        to="/favorites" 
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
+      >
         Favorites
       </NavLink>
-      <NavLink to="/profile" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+      <NavLink 
+        to="/profile" 
+        style={({ isActive }) => ({
+          ...linkStyle,
+          ...(isActive ? activeStyle : {}),
+        })}
+      >
         Profile
       </NavLink>
     </nav>
