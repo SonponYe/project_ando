@@ -8,7 +8,7 @@ Ando provides a seamless music discovery experience without requiring users to c
 
 ## Features
 
-### 🎭 Mood-Based Discovery
+###  Mood-Based Discovery
 - Select from curated mood cards (Happy, Chill, Energetic, Sad)
 - Get personalized track recommendations based on your emotional state
 - Visual mood selection with beautiful imagery
@@ -142,4 +142,4 @@ For issues or questions, please open an issue on the GitHub repository.
 
 ---
 
-**Built with ❤️ by the Ando Team**
+just a heads-up, unless the user has premium account they will only be able to listen to a 20 of 10sec preview of each song.... i Will use a different API soon but right now i have exams so chale small time
