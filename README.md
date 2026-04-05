@@ -1,4 +1,4 @@
-# Ando 🎵
+#ANDO - vibe to the rhythm 
 
 A modern, intuitive music discovery application powered by the Spotify API. Ando helps users explore music through mood-based selections, genre filtering, and intelligent search capabilities.
 
@@ -37,6 +37,7 @@ Ando provides a seamless music discovery experience without requiring users to c
 - View your Spotify profile information
 - See recently played tracks
 - Access to Spotify account details
+- so you see your spotify details
 
 ## Technology Stack
 
@@ -47,6 +48,8 @@ Ando provides a seamless music discovery experience without requiring users to c
 - **Audio Playback**: React Howler 5.2.0
 - **Icons**: React Icons 5.5.0
 - **Styling**: Modern CSS with custom design system
+
+## will soon change to tailwind css
 
 ## Getting Started
 
