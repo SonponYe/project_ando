@@ -13,16 +13,16 @@ const Player = () => {
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#ffffff',
-        color: '#111827',
+        backgroundColor: 'rgba(12, 12, 12, 0.94)',
+        color: '#f5f5f5',
         display: 'flex',
         alignItems: 'center',
         padding: '1rem 1.5rem',
         gap: '1.25rem',
         zIndex: 10000,
-        boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 -6px 24px rgba(0, 0, 0, 0.5)',
         backdropFilter: 'blur(10px)',
-        borderTop: '1px solid #e5e7eb',
+        borderTop: '1px solid #303030',
       }}
     >
       <img
@@ -48,7 +48,7 @@ const Player = () => {
         </div>
         <div style={{ 
           fontSize: '0.85rem', 
-          color: '#6b7280',
+          color: '#a3a3a3',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -70,15 +70,15 @@ const Player = () => {
 };
 
 const buttonStyle = {
-  background: 'linear-gradient(135deg, #6366f1, #818cf8)',
+  background: 'linear-gradient(135deg, #f5f5f5, #cfcfcf)',
   border: 'none',
-  color: 'white',
+  color: '#111111',
   padding: '0.625rem 1.25rem',
   borderRadius: '10px',
   cursor: 'pointer',
   fontWeight: '600',
   fontSize: '0.9rem',
-  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   letterSpacing: '0.3px',
 };
