@@ -37,5 +37,17 @@ export default function CallbackPage() {
     handleAuth();
   }, [navigate, location]);
 
-  return <div>Authenticating with Spotify...</div>;
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#f5f5f5',
+      background: 'radial-gradient(circle at top, #2f2f2f 0%, #111111 45%, #060606 100%)',
+      letterSpacing: '0.3px',
+    }}>
+      Authenticating with Spotify...
+    </div>
+  );
 }
