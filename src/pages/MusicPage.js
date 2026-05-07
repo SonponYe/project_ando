@@ -5,10 +5,10 @@ import { searchTracks } from '../api/spotify/api';
 import { isAuthenticated, initiateAuthFlow } from '../api/spotify/token';
 
 const moods = [
-  { name: 'Happy', color: '#FFD700' },
-  { name: 'Chill', color: '#00CED1' },
-  { name: 'Energetic', color: '#FF4500' },
-  { name: 'Sad', color: '#708090' },
+  { name: 'Happy', color: '#404040' },
+  { name: 'Chill', color: '#2e2e2e' },
+  { name: 'Energetic', color: '#575757' },
+  { name: 'Sad', color: '#222222' },
 ];
 
 const genres = ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Afrobeats'];
@@ -49,12 +49,22 @@ const MusicPage = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '700px', margin: 'auto' }}>
+    <div style={{
+      padding: '2rem',
+      maxWidth: '700px',
+      margin: 'auto',
+      background: 'linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(8, 8, 8, 0.95))',
+      border: '1px solid #2f2f2f',
+      borderRadius: '20px',
+      boxShadow: '0 18px 40px rgba(0, 0, 0, 0.45)',
+      marginTop: '1.5rem',
+      marginBottom: '6rem',
+    }}>
       <h1 style={{ 
         fontSize: '2rem', 
         fontWeight: '800', 
         marginBottom: '2rem',
-        color: '#111827',
+        color: '#f5f5f5',
         letterSpacing: '-0.5px',
       }}>
         🎧 Discover Music
@@ -75,15 +85,15 @@ const MusicPage = () => {
               flex: 1,
               minWidth: '120px',
               textAlign: 'center',
-              boxShadow: selectedMood === mood.name 
-                ? '0 8px 25px rgba(0, 0, 0, 0.25)' 
-                : '0 4px 12px rgba(0, 0, 0, 0.1)',
+              boxShadow: selectedMood === mood.name
+                ? '0 8px 25px rgba(0, 0, 0, 0.55)'
+                : '0 4px 12px rgba(0, 0, 0, 0.35)',
               userSelect: 'none',
               fontWeight: '700',
               fontSize: '1rem',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               transform: selectedMood === mood.name ? 'scale(1.05) translateY(-4px)' : 'scale(1)',
-              border: selectedMood === mood.name ? '3px solid rgba(255, 255, 255, 0.5)' : 'none',
+              border: selectedMood === mood.name ? '2px solid #e5e5e5' : '1px solid #3b3b3b',
             }}
           >
             {mood.name}
@@ -99,7 +109,7 @@ const MusicPage = () => {
             display: 'block',
             marginBottom: '0.5rem',
             fontWeight: '600',
-            color: '#374151',
+            color: '#d4d4d8',
             fontSize: '0.95rem',
           }}
         >
@@ -113,10 +123,10 @@ const MusicPage = () => {
             width: '100%',
             padding: '0.875rem 1rem',
             borderRadius: '12px',
-            border: '2px solid #e5e7eb',
+            border: '2px solid #3b3b3b',
             fontSize: '1rem',
-            backgroundColor: '#ffffff',
-            color: '#111827',
+            backgroundColor: '#101010',
+            color: '#f5f5f5',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
           }}
@@ -134,8 +144,8 @@ const MusicPage = () => {
         disabled={loading || (!selectedMood && !selectedGenre)}
         style={{
           background: loading || (!selectedMood && !selectedGenre)
-            ? '#9ca3af'
-            : 'linear-gradient(135deg, #6366f1, #818cf8)',
+            ? '#525252'
+            : 'linear-gradient(135deg, #f5f5f5, #d4d4d4)',
           color: 'white',
           padding: '1rem 1.5rem',
           borderRadius: '12px',
@@ -145,7 +155,7 @@ const MusicPage = () => {
           width: '100%',
           fontWeight: '700',
           fontSize: '1rem',
-          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.45)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           letterSpacing: '0.3px',
         }}
@@ -174,15 +184,15 @@ const MusicPage = () => {
           type="submit"
           disabled={loading}
           style={{
-            background: loading ? '#9ca3af' : 'linear-gradient(135deg, #111827, #374151)',
-            color: 'white',
+            background: loading ? '#525252' : 'linear-gradient(135deg, #f5f5f5, #cfcfcf)',
+            color: '#0a0a0a',
             padding: '0.875rem 1.75rem',
             borderRadius: '12px',
             border: 'none',
             cursor: loading ? 'not-allowed' : 'pointer',
             fontWeight: '700',
             fontSize: '1rem',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.45)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             whiteSpace: 'nowrap',
           }}
