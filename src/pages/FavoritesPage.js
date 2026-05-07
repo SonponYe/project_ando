@@ -9,14 +9,19 @@ const FavoritesPage = () => {
 
   if (!favorites.length) {
     return (
-      <div style={{ 
-        padding: '4rem 2rem', 
+      <div style={{
+        padding: '4rem 2rem',
         textAlign: 'center',
         minHeight: '60vh',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        background: 'linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(8, 8, 8, 0.95))',
+        border: '1px solid #2f2f2f',
+        borderRadius: '16px',
+        margin: '1.5rem auto',
+        maxWidth: '900px',
       }}>
         <div style={{
           fontSize: '4rem',
@@ -36,7 +41,15 @@ const FavoritesPage = () => {
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '900px', margin: 'auto' }}>
+    <div style={{
+      padding: '2rem',
+      maxWidth: '900px',
+      margin: '1.5rem auto 6rem',
+      border: '1px solid #2f2f2f',
+      borderRadius: '16px',
+      background: 'linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(8, 8, 8, 0.95))',
+      boxShadow: '0 14px 34px rgba(0, 0, 0, 0.5)',
+    }}>
       <h1 style={{ 
         fontSize: '2rem', 
         fontWeight: '800', 
@@ -54,13 +67,13 @@ const FavoritesPage = () => {
             <div
               key={track.id}
               style={{
-                border: isCurrent ? '2px solid #6366f1' : '2px solid #e5e7eb',
+                border: isCurrent ? '2px solid #f5f5f5' : '2px solid #2f2f2f',
                 padding: '1.25rem',
                 borderRadius: '16px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '1.25rem',
-                backgroundColor: isCurrent ? '#eef2ff' : '#ffffff',
+                backgroundColor: isCurrent ? '#242424' : '#121212',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
@@ -92,11 +105,11 @@ const FavoritesPage = () => {
                     width: 72,
                     height: 72,
                     borderRadius: '12px',
-                    backgroundColor: '#e5e7eb',
+                    backgroundColor: '#2f2f2f',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#9ca3af',
+                    color: '#a3a3a3',
                     fontSize: '0.75rem',
                     fontWeight: '600',
                   }}
@@ -109,7 +122,7 @@ const FavoritesPage = () => {
                   fontSize: '1.05rem', 
                   display: 'block', 
                   marginBottom: '0.25rem',
-                  color: '#111827',
+                  color: '#f3f4f6',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -118,7 +131,7 @@ const FavoritesPage = () => {
                 </strong>
                 <em style={{ 
                   fontSize: '0.9rem', 
-                  color: '#6b7280',
+                  color: '#a3a3a3',
                   display: 'block',
                   marginBottom: '0.25rem',
                   overflow: 'hidden',
@@ -143,11 +156,11 @@ const FavoritesPage = () => {
                 onClick={() => setCurrentTrack(track)}
                 disabled={!track.preview_url}
                 style={{
-                  background: isCurrent 
-                    ? 'linear-gradient(135deg, #4f46e5, #6366f1)' 
-                    : track.preview_url 
-                      ? 'linear-gradient(135deg, #6366f1, #818cf8)' 
-                      : '#d1d5db',
+                  background: isCurrent
+                    ? 'linear-gradient(135deg, #ffffff, #d4d4d4)'
+                    : track.preview_url
+                      ? 'linear-gradient(135deg, #e5e5e5, #bcbcbc)'
+                      : '#4b5563',
                   border: 'none',
                   color: 'white',
                   padding: '0.625rem 1.25rem',
@@ -155,7 +168,7 @@ const FavoritesPage = () => {
                   cursor: track.preview_url ? 'pointer' : 'not-allowed',
                   fontWeight: '600',
                   fontSize: '0.9rem',
-                  boxShadow: track.preview_url ? '0 2px 8px rgba(99, 102, 241, 0.3)' : 'none',
+                  boxShadow: track.preview_url ? '0 2px 8px rgba(0, 0, 0, 0.35)' : 'none',
                   transition: 'all 0.3s ease',
                   whiteSpace: 'nowrap',
                 }}
@@ -171,7 +184,7 @@ const FavoritesPage = () => {
               <button
                 onClick={() => toggleFavorite(track)}
                 style={{
-                  background: 'linear-gradient(135deg, #dc2626, #ef4444)',
+                  background: 'linear-gradient(135deg, #f5f5f5, #d4d4d4)',
                   border: 'none',
                   color: 'white',
                   padding: '0.625rem 1.25rem',
@@ -179,7 +192,7 @@ const FavoritesPage = () => {
                   cursor: 'pointer',
                   fontWeight: '600',
                   fontSize: '0.9rem',
-                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
                   transition: 'all 0.3s ease',
                   whiteSpace: 'nowrap',
                 }}

@@ -13,15 +13,31 @@ const MusicListPage = () => {
 
   if (!tracks.length) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2>No tracks found.</h2>
+      <div style={{
+        padding: '2rem',
+        textAlign: 'center',
+        maxWidth: '900px',
+        margin: '2rem auto',
+        border: '1px solid #2f2f2f',
+        borderRadius: '16px',
+        background: 'rgba(12, 12, 12, 0.9)',
+      }}>
+        <h2 style={{ color: '#f5f5f5' }}>No tracks found.</h2>
         <button onClick={() => navigate('/music')}>Back to Search</button>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '900px', margin: 'auto' }}>
+    <div style={{
+      padding: '2rem',
+      maxWidth: '900px',
+      margin: '1.5rem auto 6rem',
+      border: '1px solid #2f2f2f',
+      borderRadius: '16px',
+      background: 'linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(8, 8, 8, 0.95))',
+      boxShadow: '0 14px 34px rgba(0, 0, 0, 0.5)',
+    }}>
       <h1 style={{ 
         fontSize: '2rem', 
         fontWeight: '800', 
@@ -40,13 +56,13 @@ const MusicListPage = () => {
             <div
               key={track.id}
               style={{
-                border: isCurrent ? '2px solid #6366f1' : '2px solid #e5e7eb',
+                border: isCurrent ? '2px solid #f5f5f5' : '2px solid #2f2f2f',
                 padding: '1.25rem',
                 borderRadius: '16px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '1.25rem',
-                backgroundColor: isCurrent ? '#eef2ff' : '#ffffff',
+                backgroundColor: isCurrent ? '#242424' : '#121212',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
@@ -78,7 +94,7 @@ const MusicListPage = () => {
                   fontSize: '1.05rem', 
                   display: 'block', 
                   marginBottom: '0.25rem',
-                  color: '#111827',
+                  color: '#f3f4f6',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -87,7 +103,7 @@ const MusicListPage = () => {
                 </strong>
                 <em style={{ 
                   fontSize: '0.9rem', 
-                  color: '#6b7280',
+                  color: '#a3a3a3',
                   display: 'block',
                   marginBottom: '0.25rem',
                   overflow: 'hidden',
@@ -98,7 +114,7 @@ const MusicListPage = () => {
                 </em>
                 <small style={{ 
                   fontSize: '0.85rem', 
-                  color: '#9ca3af',
+                  color: '#737373',
                   display: 'block',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -112,11 +128,11 @@ const MusicListPage = () => {
                 onClick={() => setCurrentTrack(track)}
                 disabled={!track.preview_url}
                 style={{
-                  background: isCurrent 
-                    ? 'linear-gradient(135deg, #4f46e5, #6366f1)' 
-                    : track.preview_url 
-                      ? 'linear-gradient(135deg, #6366f1, #818cf8)' 
-                      : '#d1d5db',
+                  background: isCurrent
+                    ? 'linear-gradient(135deg, #ffffff, #d4d4d4)'
+                    : track.preview_url
+                      ? 'linear-gradient(135deg, #e5e5e5, #bcbcbc)'
+                      : '#4b5563',
                   border: 'none',
                   color: 'white',
                   padding: '0.625rem 1.25rem',
@@ -124,7 +140,7 @@ const MusicListPage = () => {
                   cursor: track.preview_url ? 'pointer' : 'not-allowed',
                   fontWeight: '600',
                   fontSize: '0.9rem',
-                  boxShadow: track.preview_url ? '0 2px 8px rgba(99, 102, 241, 0.3)' : 'none',
+                  boxShadow: track.preview_url ? '0 2px 8px rgba(0, 0, 0, 0.35)' : 'none',
                   transition: 'all 0.3s ease',
                   whiteSpace: 'nowrap',
                 }}
@@ -140,9 +156,9 @@ const MusicListPage = () => {
               <button
                 onClick={() => toggleFavorite(track)}
                 style={{
-                  background: favorite 
-                    ? 'linear-gradient(135deg, #ec4899, #f472b6)' 
-                    : 'linear-gradient(135deg, #d1d5db, #e5e7eb)',
+                  background: favorite
+                    ? 'linear-gradient(135deg, #ffffff, #d4d4d4)'
+                    : 'linear-gradient(135deg, #444444, #2f2f2f)',
                   border: 'none',
                   color: 'white',
                   padding: '0.625rem 1rem',
@@ -150,7 +166,7 @@ const MusicListPage = () => {
                   cursor: 'pointer',
                   fontWeight: '600',
                   fontSize: '1.1rem',
-                  boxShadow: favorite ? '0 2px 8px rgba(236, 72, 153, 0.3)' : 'none',
+                  boxShadow: favorite ? '0 2px 8px rgba(0, 0, 0, 0.35)' : 'none',
                   transition: 'all 0.3s ease',
                 }}
                 aria-pressed={favorite}
