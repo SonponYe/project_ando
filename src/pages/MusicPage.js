@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchTracks } from '../api/spotify/api';
+import { isAuthenticated, initiateAuthFlow } from '../api/spotify/token';
 
 const moods = [
   { name: 'Happy', color: '#FFD700' },
@@ -22,6 +23,10 @@ const MusicPage = () => {
   // Handle Explore button (mood + genre)
   const handleExplore = async () => {
     if (!selectedMood && !selectedGenre) return;
+    if (!isAuthenticated()) {
+      await initiateAuthFlow();
+      return;
+    }
     setLoading(true);
     const query = [selectedMood, selectedGenre].filter(Boolean).join(' ');
     const tracks = await searchTracks(query);
@@ -33,6 +38,10 @@ const MusicPage = () => {
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
+    if (!isAuthenticated()) {
+      await initiateAuthFlow();
+      return;
+    }
     setLoading(true);
     const tracks = await searchTracks(searchQuery);
     setLoading(false);
