@@ -31,7 +31,7 @@ const FavoritesPage = () => {
         </div>
         <p style={{
           fontSize: '1.25rem',
-          color: '#6b7280',
+          color: '#a3a3a3',
           fontWeight: '500',
         }}>
           No favorite tracks yet. Start exploring and add some music!
@@ -54,7 +54,7 @@ const FavoritesPage = () => {
         fontSize: '2rem', 
         fontWeight: '800', 
         marginBottom: '2rem',
-        color: '#111827',
+        color: '#f5f5f5',
         letterSpacing: '-0.5px',
       }}>
         ❤️ Your Favorites
@@ -142,7 +142,7 @@ const FavoritesPage = () => {
                 </em>
                 <small style={{ 
                   fontSize: '0.85rem', 
-                  color: '#9ca3af',
+                  color: '#737373',
                   display: 'block',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -162,7 +162,7 @@ const FavoritesPage = () => {
                       ? 'linear-gradient(135deg, #e5e5e5, #bcbcbc)'
                       : '#4b5563',
                   border: 'none',
-                  color: 'white',
+                  color: track.preview_url ? '#0a0a0a' : '#f5f5f5',
                   padding: '0.625rem 1.25rem',
                   borderRadius: '10px',
                   cursor: track.preview_url ? 'pointer' : 'not-allowed',
@@ -186,7 +186,7 @@ const FavoritesPage = () => {
                 style={{
                   background: 'linear-gradient(135deg, #f5f5f5, #d4d4d4)',
                   border: 'none',
-                  color: 'white',
+                  color: '#0a0a0a',
                   padding: '0.625rem 1.25rem',
                   borderRadius: '10px',
                   cursor: 'pointer',

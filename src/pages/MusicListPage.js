@@ -42,7 +42,7 @@ const MusicListPage = () => {
         fontSize: '2rem', 
         fontWeight: '800', 
         marginBottom: '2rem',
-        color: '#111827',
+        color: '#f5f5f5',
         letterSpacing: '-0.5px',
       }}>
         🎶 Search Results
@@ -134,7 +134,7 @@ const MusicListPage = () => {
                       ? 'linear-gradient(135deg, #e5e5e5, #bcbcbc)'
                       : '#4b5563',
                   border: 'none',
-                  color: 'white',
+                  color: track.preview_url ? '#0a0a0a' : '#f5f5f5',
                   padding: '0.625rem 1.25rem',
                   borderRadius: '10px',
                   cursor: track.preview_url ? 'pointer' : 'not-allowed',
@@ -160,7 +160,7 @@ const MusicListPage = () => {
                     ? 'linear-gradient(135deg, #ffffff, #d4d4d4)'
                     : 'linear-gradient(135deg, #444444, #2f2f2f)',
                   border: 'none',
-                  color: 'white',
+                  color: favorite ? '#0a0a0a' : '#f5f5f5',
                   padding: '0.625rem 1rem',
                   borderRadius: '10px',
                   cursor: 'pointer',

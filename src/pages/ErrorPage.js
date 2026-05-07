@@ -6,13 +6,20 @@ const ErrorPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center text-red-600">
-      <h1 className="text-3xl font-bold mb-4">Something went wrong 😕</h1>
-      <p className="mb-4">Could not authenticate or load the app properly.</p>
-      <button
-        onClick={() => navigate("/auth")}
-        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition"
-      >
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      color: '#f5f5f5',
+      padding: '2rem',
+      background: 'radial-gradient(circle at top, #2f2f2f 0%, #111111 45%, #060606 100%)',
+    }}>
+      <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Something went wrong</h1>
+      <p style={{ marginBottom: '1.25rem', color: '#b3b3b3' }}>Could not authenticate or load the app properly.</p>
+      <button onClick={() => navigate('/')}>
         Try Again
       </button>
     </div>

@@ -146,7 +146,7 @@ const MusicPage = () => {
           background: loading || (!selectedMood && !selectedGenre)
             ? '#525252'
             : 'linear-gradient(135deg, #f5f5f5, #d4d4d4)',
-          color: 'white',
+          color: '#0a0a0a',
           padding: '1rem 1.5rem',
           borderRadius: '12px',
           border: 'none',
@@ -174,9 +174,10 @@ const MusicPage = () => {
             flex: 1, 
             padding: '0.875rem 1.25rem', 
             borderRadius: '12px', 
-            border: '2px solid #e5e7eb',
+            border: '2px solid #3b3b3b',
             fontSize: '1rem',
-            backgroundColor: '#ffffff',
+            backgroundColor: '#101010',
+            color: '#f5f5f5',
             transition: 'all 0.3s ease',
           }}
         />

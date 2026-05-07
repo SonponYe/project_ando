@@ -13,7 +13,7 @@ const AudioPlayer = ({ track }) => {
   }, [track]);
 
   if (!track?.preview_url) {
-    return <p>No preview available for this track.</p>;
+    return <p style={{ color: '#a3a3a3' }}>No preview available for this track.</p>;
   }
 
   return (

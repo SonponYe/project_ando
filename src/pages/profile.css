@@ -267,4 +267,65 @@
     height: 180px;
   }
 }
-  
+
+/* Monochrome overrides */
+.whole.profile {
+  background: radial-gradient(circle at 20% 10%, #2d2d2d 0%, #121212 48%, #070707 100%);
+  color: #f5f5f5;
+}
+
+.whole.profile::before {
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
+}
+
+.profile.image {
+  border: 3px solid #3a3a3a;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.email,
+.followers,
+.country,
+.product {
+  color: #c4c4c8;
+}
+
+.socials button {
+  background: rgba(22, 22, 22, 0.9);
+  border: 1px solid #353535;
+  color: #f4f4f5;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.socials button:hover {
+  background: rgba(38, 38, 38, 0.96);
+  border-color: #4a4a4a;
+}
+
+.recent.track-item,
+.list li {
+  background: rgba(18, 18, 18, 0.88);
+  border: 1px solid #2f2f2f;
+}
+
+.recent.track-item:hover,
+.list li:hover {
+  background: rgba(32, 32, 32, 0.92);
+}
+
+.recent.image {
+  border: 1px solid #3a3a3a;
+}
+
+.recent.name,
+.actual.name {
+  color: #f5f5f5;
+}
+
+.track.name,
+.no.recent,
+.no.recent.load {
+  color: #a1a1aa;
+}
