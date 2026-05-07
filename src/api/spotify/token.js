@@ -2,7 +2,13 @@
 const SPOTIFY_CLIENT_ID = process.env.REACT_APP_SPOTIFY_ID || '<YOUR_SPOTIFY_ID>'; // use CRA env var
 
 // Use environment variable or hardcode for local/production
-const REDIRECT_URI = 'https://ando-ten.vercel.app/callback';
+const REDIRECT_URI = (function() {
+  if (process.env.REACT_APP_SPOTIFY_REDIRECT_URI) return process.env.REACT_APP_SPOTIFY_REDIRECT_URI;
+  if (typeof window !== 'undefined' && window.location && window.location.origin.includes('localhost')) {
+    return 'http://localhost:3000/callback';
+  }
+  return 'https://ando-ten.vercel.app/callback';
+})();
 
 const SCOPES = [
   'user-read-private',
