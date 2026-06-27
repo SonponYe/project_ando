@@ -1,4 +1,3 @@
-// src/pages/HomePage.js
 import React from 'react';
 import { initiateAuthFlow } from '../api/spotify/token';
 
@@ -9,66 +8,53 @@ const HomePage = () => {
 
   return (
     <div style={{
+      minHeight: '100vh',
       display: 'flex',
-      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '100vh',
-      textAlign: 'center',
       padding: '2rem',
-      background: 'radial-gradient(circle at 30% 20%, #323232 0%, #141414 48%, #050505 100%)',
-      color: '#ffffff',
+      background: 'radial-gradient(ellipse at 20% 30%, #1c1c1c 0%, #0a0a0a 55%, #060606 100%)',
     }}>
-      <div style={{
-        maxWidth: '600px',
-        padding: '3rem 2rem',
-        borderRadius: '24px',
-        background: 'rgba(18, 18, 18, 0.76)',
-        backdropFilter: 'blur(20px)',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-        border: '1px solid #323232',
-      }}>        <h1 style={{
-          fontSize: '3rem',
-          fontWeight: '800',
-          marginBottom: '1.5rem',
-          letterSpacing: '-1px',
-          textShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-        }}>
-          Welcome to Ando 🎵
-        </h1>
+      <div style={{ maxWidth: 480, width: '100%' }}>
         <p style={{
-          fontSize: '1.15rem',
-          marginBottom: '2.5rem',
-          lineHeight: '1.7',
-          opacity: '0.95',
-          fontWeight: '400',
+          fontSize: '0.72rem',
+          fontWeight: 600,
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          color: '#444',
+          marginBottom: '1.25rem',
         }}>
-          Discover music by mood, genre, or search — personalized recommendations powered by Spotify.
+          Music Discovery
         </p>
+
+        <h1 style={{
+          fontSize: 'clamp(2.25rem, 6vw, 3rem)',
+          fontWeight: 800,
+          color: '#f0f0f0',
+          letterSpacing: '-1px',
+          lineHeight: 1.1,
+          marginBottom: '1rem',
+        }}>
+          Your sound,<br />your mood.
+        </h1>
+
+        <p style={{
+          fontSize: '1rem',
+          color: '#666',
+          lineHeight: 1.7,
+          marginBottom: '2.5rem',
+          maxWidth: 360,
+        }}>
+          Search by artist, track, or how you feel.
+          Powered by Spotify.
+        </p>
+
         <button
           onClick={handleLogin}
-          style={{
-            background: 'linear-gradient(135deg, #ffffff, #d4d4d4)',
-            color: '#0a0a0a',
-            padding: '1rem 2.5rem',
-            borderRadius: '14px',
-            border: 'none',
-            fontSize: '1.1rem',
-            fontWeight: '700',
-            cursor: 'pointer',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            letterSpacing: '0.5px',
-          }}
-          onMouseOver={(e) => {
-            e.target.style.transform = 'translateY(-4px)';
-            e.target.style.boxShadow = '0 12px 32px rgba(0, 0, 0, 0.7)';
-          }}          onMouseOut={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
-          }}
+          className="btn-primary"
+          style={{ fontSize: '0.9rem', padding: '0.875rem 2rem' }}
         >
-          🎧 Start Listening
+          Connect with Spotify
         </button>
       </div>
     </div>

@@ -1,213 +1,136 @@
 import React, { useContext } from 'react';
+import { FaPlay, FaPause, FaTimes } from 'react-icons/fa';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
-import AudioPlayer from '../components/AudioPlayer';
 
 const FavoritesPage = () => {
+  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(PlaybackContext);
   const { favorites, toggleFavorite } = useContext(FavoritesContext);
-  const { currentTrack, setCurrentTrack } = useContext(PlaybackContext);
 
-  if (!favorites.length) {
-    return (
-      <div style={{
-        padding: '4rem 2rem',
-        textAlign: 'center',
-        minHeight: '60vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(8, 8, 8, 0.95))',
-        border: '1px solid #2f2f2f',
-        borderRadius: '16px',
-        margin: '1.5rem auto',
-        maxWidth: '900px',
-      }}>
-        <div style={{
-          fontSize: '4rem',
-          marginBottom: '1rem',
-        }}>
-          💔
-        </div>
-        <p style={{
-          fontSize: '1.25rem',
-          color: '#a3a3a3',
-          fontWeight: '500',
-        }}>
-          No favorite tracks yet. Start exploring and add some music!
-        </p>
-      </div>
-    );
-  }
+  const handleTrackPlay = (track) => {
+    if (!track.preview_url) return;
+    if (currentTrack?.id === track.id && isPlaying) {
+      pauseTrack();
+    } else {
+      playTrack(track);
+    }
+  };
 
   return (
-    <div style={{
-      padding: '2rem',
-      maxWidth: '900px',
-      margin: '1.5rem auto 6rem',
-      border: '1px solid #2f2f2f',
-      borderRadius: '16px',
-      background: 'linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(8, 8, 8, 0.95))',
-      boxShadow: '0 14px 34px rgba(0, 0, 0, 0.5)',
-    }}>
-      <h1 style={{ 
-        fontSize: '2rem', 
-        fontWeight: '800', 
-        marginBottom: '2rem',
-        color: '#f5f5f5',
-        letterSpacing: '-0.5px',
-      }}>
-        ❤️ Your Favorites
-      </h1>
-      <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
-        {favorites.map((track) => {
-          const isCurrent = currentTrack?.id === track.id;
-
-          return (
-            <div
-              key={track.id}
-              style={{
-                border: isCurrent ? '2px solid #f5f5f5' : '2px solid #2f2f2f',
-                padding: '1.25rem',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1.25rem',
-                backgroundColor: isCurrent ? '#242424' : '#121212',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-              onMouseEnter={(e) => {
-                if (!isCurrent) {
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.12)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.06)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              {track.album?.images?.[0]?.url ? (
-                <img
-                  src={track.album.images[0].url}
-                  alt={track.name}
-                  style={{ 
-                    width: 72, 
-                    height: 72, 
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: '12px',
-                    backgroundColor: '#2f2f2f',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#a3a3a3',
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                  }}
-                >
-                  No Image
-                </div>
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <strong style={{ 
-                  fontSize: '1.05rem', 
-                  display: 'block', 
-                  marginBottom: '0.25rem',
-                  color: '#f3f4f6',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {track.name}
-                </strong>
-                <em style={{ 
-                  fontSize: '0.9rem', 
-                  color: '#a3a3a3',
-                  display: 'block',
-                  marginBottom: '0.25rem',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {track.artists.map((a) => a.name).join(', ')}
-                </em>
-                <small style={{ 
-                  fontSize: '0.85rem', 
-                  color: '#737373',
-                  display: 'block',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {track.album?.name}
-                </small>
-              </div>
-
-              <button
-                onClick={() => setCurrentTrack(track)}
-                disabled={!track.preview_url}
-                style={{
-                  background: isCurrent
-                    ? 'linear-gradient(135deg, #ffffff, #d4d4d4)'
-                    : track.preview_url
-                      ? 'linear-gradient(135deg, #e5e5e5, #bcbcbc)'
-                      : '#4b5563',
-                  border: 'none',
-                  color: track.preview_url ? '#0a0a0a' : '#f5f5f5',
-                  padding: '0.625rem 1.25rem',
-                  borderRadius: '10px',
-                  cursor: track.preview_url ? 'pointer' : 'not-allowed',
-                  fontWeight: '600',
-                  fontSize: '0.9rem',
-                  boxShadow: track.preview_url ? '0 2px 8px rgba(0, 0, 0, 0.35)' : 'none',
-                  transition: 'all 0.3s ease',
-                  whiteSpace: 'nowrap',
-                }}
-                aria-label={
-                  track.preview_url
-                    ? `${isCurrent ? 'Playing' : 'Play'} ${track.name}`
-                    : 'Preview not available'
-                }
-              >
-                {isCurrent ? '▶ Playing' : '▶ Play'}
-              </button>
-
-              <button
-                onClick={() => toggleFavorite(track)}
-                style={{
-                  background: 'linear-gradient(135deg, #f5f5f5, #d4d4d4)',
-                  border: 'none',
-                  color: '#0a0a0a',
-                  padding: '0.625rem 1.25rem',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.9rem',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
-                  transition: 'all 0.3s ease',
-                  whiteSpace: 'nowrap',
-                }}
-                aria-label={`Remove ${track.name} from favorites`}
-                aria-pressed="true"
-              >
-                🗑 Remove
-              </button>
-            </div>
-          );
-        })}
+    <div className="page-wrap">
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{
+          fontSize: '1.75rem',
+          fontWeight: 800,
+          color: '#f0f0f0',
+          letterSpacing: '-0.5px',
+          marginBottom: '0.25rem',
+        }}>
+          Favorites
+        </h1>
+        <p style={{ color: '#444', fontSize: '0.85rem' }}>
+          {favorites.length > 0
+            ? `${favorites.length} saved track${favorites.length !== 1 ? 's' : ''}`
+            : 'Your saved tracks'}
+        </p>
       </div>
 
-      {/* Place AudioPlayer at bottom */}
-      <AudioPlayer track={currentTrack} />
+      {favorites.length === 0 ? (
+        <div className="state-center">
+          <p>No favorites yet</p>
+          <p>Save tracks from the Discover page</p>
+        </div>
+      ) : (
+        <div>
+          {favorites.map((track) => {
+            const isCurrent = currentTrack?.id === track.id;
+            const isCurrentlyPlaying = isCurrent && isPlaying;
+
+            return (
+              <div
+                key={track.id}
+                className={`track-row${isCurrent ? ' track-row--active' : ''}`}
+                onClick={() => handleTrackPlay(track)}
+              >
+                {/* Album art */}
+                {track.album?.images?.[0]?.url ? (
+                  <img
+                    src={track.album.images[0].url}
+                    alt={track.name}
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 8,
+                      objectFit: 'cover',
+                      flexShrink: 0,
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 8,
+                    background: '#1a1a1a',
+                    flexShrink: 0,
+                  }} />
+                )}
+
+                {/* Track info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    color: isCurrent ? '#f5f5f5' : '#d4d4d4',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1.3,
+                  }}>
+                    {track.name}
+                  </div>
+                  <div style={{
+                    fontSize: '0.78rem',
+                    color: '#555',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    marginTop: 2,
+                  }}>
+                    {track.artists?.map(a => a.name).join(', ')}
+                    {track.album?.name && (
+                      <span style={{ color: '#3a3a3a' }}> · {track.album.name}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Remove button */}
+                <button
+                  className="icon-btn"
+                  onClick={e => { e.stopPropagation(); toggleFavorite(track); }}
+                  aria-label={`Remove ${track.name} from favorites`}
+                  title="Remove"
+                >
+                  <FaTimes size={12} />
+                </button>
+
+                {/* Play/pause button */}
+                <button
+                  className="row-play-btn"
+                  onClick={e => { e.stopPropagation(); handleTrackPlay(track); }}
+                  disabled={!track.preview_url}
+                  aria-label={isCurrentlyPlaying ? 'Pause' : 'Play'}
+                  style={{ opacity: isCurrent ? 1 : undefined }}
+                >
+                  {isCurrentlyPlaying
+                    ? <FaPause size={11} />
+                    : <FaPlay size={11} style={{ marginLeft: 1 }} />
+                  }
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

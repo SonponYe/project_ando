@@ -1,206 +1,260 @@
-// src/pages/MusicPage.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { FaPlay, FaPause, FaHeart, FaRegHeart, FaSearch } from 'react-icons/fa';
 import { searchTracks } from '../api/spotify/api';
 import { isAuthenticated, initiateAuthFlow } from '../api/spotify/token';
+import { PlaybackContext } from '../context/PlaybackContext';
+import { FavoritesContext } from '../context/FavoritesContext';
 
-const moods = [
-  { name: 'Happy', color: '#404040' },
-  { name: 'Chill', color: '#2e2e2e' },
-  { name: 'Energetic', color: '#575757' },
-  { name: 'Sad', color: '#222222' },
-];
-
-const genres = ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Afrobeats'];
+const MOODS = ['Happy', 'Chill', 'Energetic', 'Sad', 'Focus'];
+const GENRES = ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Afrobeats', 'Electronic'];
 
 const MusicPage = () => {
+  const [query, setQuery] = useState('');
   const [selectedMood, setSelectedMood] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [hasSearched, setHasSearched] = useState(false);
 
-  // Handle Explore button (mood + genre)
-  const handleExplore = async () => {
-    if (!selectedMood && !selectedGenre) return;
+  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(PlaybackContext);
+  const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
+
+  const runSearch = async (q) => {
+    if (!q.trim()) return;
     if (!isAuthenticated()) {
       await initiateAuthFlow();
       return;
     }
     setLoading(true);
-    const query = [selectedMood, selectedGenre].filter(Boolean).join(' ');
-    const tracks = await searchTracks(query);
+    setHasSearched(true);
+    const results = await searchTracks(q);
+    setTracks(results);
     setLoading(false);
-    navigate('/music-list', { state: { tracks } });
   };
 
-  // Handle search bar submit
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
-    if (!searchQuery.trim()) return;
-    if (!isAuthenticated()) {
-      await initiateAuthFlow();
-      return;
-    }
-    setLoading(true);
-    const tracks = await searchTracks(searchQuery);
-    setLoading(false);
-    navigate('/music-list', { state: { tracks } });
+    runSearch(query);
   };
+
+  const handleExplore = () => {
+    const q = [selectedMood, selectedGenre].filter(Boolean).join(' ');
+    runSearch(q);
+  };
+
+  const handleTrackPlay = (track) => {
+    if (!track.preview_url) return;
+    if (currentTrack?.id === track.id && isPlaying) {
+      pauseTrack();
+    } else {
+      playTrack(track);
+    }
+  };
+
+  const canExplore = selectedMood || selectedGenre;
 
   return (
-    <div style={{
-      padding: '2rem',
-      maxWidth: '700px',
-      margin: 'auto',
-      background: 'linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(8, 8, 8, 0.95))',
-      border: '1px solid #2f2f2f',
-      borderRadius: '20px',
-      boxShadow: '0 18px 40px rgba(0, 0, 0, 0.45)',
-      marginTop: '1.5rem',
-      marginBottom: '6rem',
-    }}>
-      <h1 style={{ 
-        fontSize: '2rem', 
-        fontWeight: '800', 
-        marginBottom: '2rem',
-        color: '#f5f5f5',
-        letterSpacing: '-0.5px',
-      }}>
-        🎧 Discover Music
-      </h1>
-
-      {/* Mood Cards */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-        {moods.map((mood) => (
-          <div
-            key={mood.name}
-            onClick={() => setSelectedMood(mood.name)}
-            style={{
-              backgroundColor: mood.color,
-              color: 'white',
-              padding: '1.25rem',
-              borderRadius: '14px',
-              cursor: 'pointer',
-              flex: 1,
-              minWidth: '120px',
-              textAlign: 'center',
-              boxShadow: selectedMood === mood.name
-                ? '0 8px 25px rgba(0, 0, 0, 0.55)'
-                : '0 4px 12px rgba(0, 0, 0, 0.35)',
-              userSelect: 'none',
-              fontWeight: '700',
-              fontSize: '1rem',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              transform: selectedMood === mood.name ? 'scale(1.05) translateY(-4px)' : 'scale(1)',
-              border: selectedMood === mood.name ? '2px solid #e5e5e5' : '1px solid #3b3b3b',
-            }}
-          >
-            {mood.name}
-          </div>
-        ))}
-      </div>
-
-      {/* Genre Dropdown */}
+    <div className="page-wrap">
+      {/* Heading */}
       <div style={{ marginBottom: '2rem' }}>
-        <label 
-          htmlFor="genre-select" 
-          style={{ 
-            display: 'block',
-            marginBottom: '0.5rem',
-            fontWeight: '600',
-            color: '#d4d4d8',
-            fontSize: '0.95rem',
-          }}
-        >
-          Select Genre
-        </label>
-        <select
-          id="genre-select"
-          value={selectedGenre}
-          onChange={(e) => setSelectedGenre(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.875rem 1rem',
-            borderRadius: '12px',
-            border: '2px solid #3b3b3b',
-            fontSize: '1rem',
-            backgroundColor: '#101010',
-            color: '#f5f5f5',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-          }}
-        >
-          <option value="">Select genre</option>
-          {genres.map((genre) => (
-            <option key={genre} value={genre}>{genre}</option>
-          ))}
-        </select>
+        <h1 style={{
+          fontSize: '1.75rem',
+          fontWeight: 800,
+          color: '#f0f0f0',
+          letterSpacing: '-0.5px',
+          marginBottom: '0.25rem',
+        }}>
+          Discover
+        </h1>
+        <p style={{ color: '#444', fontSize: '0.85rem' }}>
+          Search or pick a mood and genre
+        </p>
       </div>
 
-      {/* Explore Button */}
-      <button
-        onClick={handleExplore}
-        disabled={loading || (!selectedMood && !selectedGenre)}
-        style={{
-          background: loading || (!selectedMood && !selectedGenre)
-            ? '#525252'
-            : 'linear-gradient(135deg, #f5f5f5, #d4d4d4)',
-          color: '#0a0a0a',
-          padding: '1rem 1.5rem',
-          borderRadius: '12px',
-          border: 'none',
-          cursor: loading || (!selectedMood && !selectedGenre) ? 'not-allowed' : 'pointer',
-          marginBottom: '2rem',
-          width: '100%',
-          fontWeight: '700',
-          fontSize: '1rem',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.45)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          letterSpacing: '0.3px',
-        }}
-      >
-        {loading ? '🔍 Searching...' : '✨ Explore Music'}
-      </button>
-
-      {/* Search Bar */}
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.75rem' }}>
+      {/* Search */}
+      <form onSubmit={handleSearch} style={{ position: 'relative', marginBottom: '1.75rem' }}>
+        <FaSearch style={{
+          position: 'absolute',
+          left: '0.9rem',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          color: '#444',
+          fontSize: '0.8rem',
+          pointerEvents: 'none',
+        }} />
         <input
+          className="search-input"
           type="text"
-          placeholder="Search songs, artists..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ 
-            flex: 1, 
-            padding: '0.875rem 1.25rem', 
-            borderRadius: '12px', 
-            border: '2px solid #3b3b3b',
-            fontSize: '1rem',
-            backgroundColor: '#101010',
-            color: '#f5f5f5',
-            transition: 'all 0.3s ease',
-          }}
+          placeholder="Artists, songs, albums..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
         />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            background: loading ? '#525252' : 'linear-gradient(135deg, #f5f5f5, #cfcfcf)',
-            color: '#0a0a0a',
-            padding: '0.875rem 1.75rem',
-            borderRadius: '12px',
-            border: 'none',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontWeight: '700',
-            fontSize: '1rem',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.45)',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {loading ? '...' : '🔍 Search'}
-        </button>
       </form>
+
+      {/* Mood chips */}
+      <div style={{ marginBottom: '1.25rem' }}>
+        <p className="section-label">Mood</p>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {MOODS.map(mood => (
+            <button
+              key={mood}
+              className={`chip${selectedMood === mood ? ' chip--active' : ''}`}
+              onClick={() => setSelectedMood(selectedMood === mood ? '' : mood)}
+            >
+              {mood}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Genre chips */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <p className="section-label">Genre</p>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {GENRES.map(genre => (
+            <button
+              key={genre}
+              className={`chip${selectedGenre === genre ? ' chip--active' : ''}`}
+              onClick={() => setSelectedGenre(selectedGenre === genre ? '' : genre)}
+            >
+              {genre}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Explore CTA */}
+      {canExplore && (
+        <button
+          className="btn-primary"
+          onClick={handleExplore}
+          disabled={loading}
+          style={{ width: '100%', marginBottom: '2rem' }}
+        >
+          {loading ? 'Searching...' : 'Explore'}
+        </button>
+      )}
+
+      {/* States */}
+      {loading && (
+        <div className="state-center">
+          <p>Finding tracks</p>
+          <p>Just a moment...</p>
+        </div>
+      )}
+
+      {!loading && !hasSearched && (
+        <div className="state-center">
+          <p>Search for something</p>
+          <p>Use the bar above or pick a mood and genre</p>
+        </div>
+      )}
+
+      {!loading && hasSearched && tracks.length === 0 && (
+        <div className="state-center">
+          <p>No tracks found</p>
+          <p>Try a different search or filter</p>
+        </div>
+      )}
+
+      {/* Track list */}
+      {!loading && tracks.length > 0 && (
+        <div>
+          <p className="section-label" style={{ marginBottom: '0.75rem' }}>
+            {tracks.length} tracks
+          </p>
+          <div>
+            {tracks.map((track) => {
+              const isCurrent = currentTrack?.id === track.id;
+              const isCurrentlyPlaying = isCurrent && isPlaying;
+              const favorited = isFavorite(track.id);
+
+              return (
+                <div
+                  key={track.id}
+                  className={`track-row${isCurrent ? ' track-row--active' : ''}`}
+                  onClick={() => handleTrackPlay(track)}
+                >
+                  {/* Album art */}
+                  {track.album?.images?.[0]?.url ? (
+                    <img
+                      src={track.album.images[0].url}
+                      alt={track.name}
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 8,
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 8,
+                      background: '#1a1a1a',
+                      flexShrink: 0,
+                    }} />
+                  )}
+
+                  {/* Track info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      color: isCurrent ? '#f5f5f5' : '#d4d4d4',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.3,
+                    }}>
+                      {track.name}
+                    </div>
+                    <div style={{
+                      fontSize: '0.78rem',
+                      color: '#555',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      marginTop: 2,
+                    }}>
+                      {track.artists?.map(a => a.name).join(', ')}
+                      {track.album?.name && (
+                        <span style={{ color: '#3a3a3a' }}> · {track.album.name}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Favorite button */}
+                  <button
+                    className={`icon-btn${favorited ? ' icon-btn--active' : ''}`}
+                    onClick={e => { e.stopPropagation(); toggleFavorite(track); }}
+                    aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+                    aria-pressed={favorited}
+                  >
+                    {favorited ? <FaHeart size={13} /> : <FaRegHeart size={13} />}
+                  </button>
+
+                  {/* Play/pause button */}
+                  <button
+                    className="row-play-btn"
+                    onClick={e => { e.stopPropagation(); handleTrackPlay(track); }}
+                    disabled={!track.preview_url}
+                    aria-label={isCurrentlyPlaying ? 'Pause' : 'Play'}
+                    style={{ opacity: isCurrent ? 1 : undefined }}
+                  >
+                    {isCurrentlyPlaying
+                      ? <FaPause size={11} />
+                      : <FaPlay size={11} style={{ marginLeft: 1 }} />
+                    }
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

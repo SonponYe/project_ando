@@ -1,67 +1,58 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-const Navbar = () => {
-  const activeStyle = {
-    fontWeight: '700',
-    color: '#ffffff',
-    borderBottom: '3px solid #f3f4f6',
-  };
+const links = [
+  { to: '/music', label: 'Music' },
+  { to: '/favorites', label: 'Favorites' },
+  { to: '/profile', label: 'Profile' },
+];
 
-  const navStyle = {
-    display: 'flex',
-    gap: '2rem',
-    padding: '1rem 2rem',
-    borderBottom: '1px solid #2f2f2f',
-    backgroundColor: 'rgba(8, 8, 8, 0.92)',
+const Navbar = () => (
+  <nav style={{
     position: 'sticky',
     top: 0,
     zIndex: 1000,
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
-    backdropFilter: 'blur(10px)',
-  };
+    background: 'rgba(8, 8, 8, 0.96)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    borderBottom: '1px solid #181818',
+    padding: '0 1.5rem',
+    height: 54,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  }}>
+    <span style={{
+      fontWeight: 800,
+      fontSize: '1.05rem',
+      color: '#f0f0f0',
+      letterSpacing: '-0.5px',
+    }}>
+      ando
+    </span>
 
-  const linkStyle = {
-    padding: '0.5rem 0',
-    color: '#9ca3af',
-    fontWeight: '500',
-    fontSize: '0.95rem',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    borderBottom: '3px solid transparent',
-    letterSpacing: '0.3px',
-  };
-
-  return (
-    <nav style={navStyle}>
-      <NavLink 
-        to="/music" 
-        style={({ isActive }) => ({
-          ...linkStyle,
-          ...(isActive ? activeStyle : {}),
-        })}
-      >
-        Music
-      </NavLink>
-      <NavLink 
-        to="/favorites" 
-        style={({ isActive }) => ({
-          ...linkStyle,
-          ...(isActive ? activeStyle : {}),
-        })}
-      >
-        Favorites
-      </NavLink>
-      <NavLink 
-        to="/profile" 
-        style={({ isActive }) => ({
-          ...linkStyle,
-          ...(isActive ? activeStyle : {}),
-        })}
-      >
-        Profile
-      </NavLink>
-    </nav>
-  );
-};
+    <div style={{ display: 'flex', gap: '0.125rem' }}>
+      {links.map(({ to, label }) => (
+        <NavLink
+          key={to}
+          to={to}
+          style={({ isActive }) => ({
+            display: 'inline-block',
+            padding: '0.375rem 0.75rem',
+            borderRadius: 8,
+            fontSize: '0.85rem',
+            fontWeight: 500,
+            color: isActive ? '#f0f0f0' : '#555',
+            background: isActive ? '#1c1c1c' : 'transparent',
+            transition: 'color 0.15s ease, background 0.15s ease',
+            textDecoration: 'none',
+          })}
+        >
+          {label}
+        </NavLink>
+      ))}
+    </div>
+  </nav>
+);
 
 export default Navbar;

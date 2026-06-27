@@ -15,6 +15,7 @@ const SCOPES = [
   'user-read-email',
   'user-library-read',
   'user-top-read',
+  'user-read-recently-played',
 ];
 
 function generateRandomString(length = 128) {
