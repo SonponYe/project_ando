@@ -43,11 +43,11 @@ export default function CallbackPage() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      color: '#f5f5f5',
-      background: 'radial-gradient(circle at top, #2f2f2f 0%, #111111 45%, #060606 100%)',
-      letterSpacing: '0.3px',
+      background: 'linear-gradient(160deg, #141414 0%, #080808 100%)',
     }}>
-      Authenticating with Spotify...
+      <p style={{ fontSize: '0.82rem', color: '#383838', letterSpacing: '0.5px' }}>
+        Connecting to Spotify...
+      </p>
     </div>
   );
 }

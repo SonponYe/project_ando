@@ -21,7 +21,8 @@
 }
 
 body {
-  background: var(--bg);
+  background: linear-gradient(160deg, #141414 0%, #080808 100%);
+  background-attachment: fixed;
   color: var(--text-1);
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -58,6 +59,10 @@ button:disabled {
   cursor: not-allowed;
 }
 
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
 input, select {
   font-family: inherit;
   outline: none;
@@ -71,17 +76,75 @@ input, select {
   padding: 0.5rem 0.75rem;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 0 -0.75rem;
   user-select: none;
+  animation: row-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .track-row:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.045);
+  transform: translateX(2px);
 }
 
 .track-row--active {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.track-row img {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.track-row:hover img {
+  transform: scale(1.04);
+}
+
+@keyframes row-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* stagger the first dozen rows so lists feel like they cascade in */
+.track-row:nth-child(1)  { animation-delay: 0.02s; }
+.track-row:nth-child(2)  { animation-delay: 0.05s; }
+.track-row:nth-child(3)  { animation-delay: 0.08s; }
+.track-row:nth-child(4)  { animation-delay: 0.11s; }
+.track-row:nth-child(5)  { animation-delay: 0.14s; }
+.track-row:nth-child(6)  { animation-delay: 0.17s; }
+.track-row:nth-child(7)  { animation-delay: 0.20s; }
+.track-row:nth-child(8)  { animation-delay: 0.23s; }
+.track-row:nth-child(9)  { animation-delay: 0.26s; }
+.track-row:nth-child(10) { animation-delay: 0.29s; }
+
+/* ── Playing indicator (animated bars, replaces static icon when active) ── */
+.eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 14px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.eq-bars span {
+  flex: 1;
+  background: #e8e8e8;
+  border-radius: 1px;
+  animation: eq-bounce 0.9s ease-in-out infinite;
+}
+
+.eq-bars span:nth-child(1) { animation-delay: -0.6s; }
+.eq-bars span:nth-child(2) { animation-delay: -0.3s; }
+.eq-bars span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes eq-bounce {
+  0%, 100% { height: 30%; }
+  50%      { height: 100%; }
+}
+
+@keyframes mini-art-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.08); }
+  50%      { box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.03); }
 }
 
 /* ── Filter chips ── */
@@ -117,6 +180,14 @@ input, select {
   background: #ffffff;
   border-color: #ffffff;
   color: #000;
+}
+
+.chip:active {
+  transform: scale(0.96);
+}
+
+.chip {
+  transform: scale(1);
 }
 
 /* ── Icon buttons (heart, etc.) ── */
