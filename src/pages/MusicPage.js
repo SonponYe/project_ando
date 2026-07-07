@@ -1,12 +1,28 @@
 import React, { useState, useContext } from 'react';
 import { LuPlay, LuPause, LuHeart, LuSearch } from 'react-icons/lu';
-import { searchTracks } from '../api/spotify/api';
-import { isAuthenticated, initiateAuthFlow } from '../api/spotify/token';
+import { searchTracks, browseByTags } from '../api/jamendo/api';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 
 const MOODS  = ['Happy', 'Chill', 'Energetic', 'Sad', 'Focus'];
 const GENRES = ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Afrobeats', 'Electronic'];
+
+// Map ando's mood/genre labels to Jamendo's tag vocabulary
+const MOOD_TAGS = {
+  Happy: 'happy',
+  Chill: 'chillout',
+  Energetic: 'energetic',
+  Sad: 'sad',
+  Focus: 'instrumental',
+};
+const GENRE_TAGS = {
+  Pop: 'pop',
+  Rock: 'rock',
+  'Hip-Hop': 'hiphop',
+  Jazz: 'jazz',
+  Afrobeats: 'afrobeat',
+  Electronic: 'electronic',
+};
 
 const MusicPage = () => {
   const [query,         setQuery]         = useState('');
@@ -19,18 +35,25 @@ const MusicPage = () => {
   const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(PlaybackContext);
   const { toggleFavorite, isFavorite }                     = useContext(FavoritesContext);
 
-  const runSearch = async (q) => {
-    if (!q.trim()) return;
-    if (!isAuthenticated()) { await initiateAuthFlow(); return; }
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
     setLoading(true);
     setHasSearched(true);
-    const results = await searchTracks(q);
+    const results = await searchTracks(query);
     setTracks(results);
     setLoading(false);
   };
 
-  const handleSearch  = (e) => { e.preventDefault(); runSearch(query); };
-  const handleExplore = ()  => runSearch([selectedMood, selectedGenre].filter(Boolean).join(' '));
+  const handleExplore = async () => {
+    const tags = [MOOD_TAGS[selectedMood], GENRE_TAGS[selectedGenre]].filter(Boolean);
+    if (!tags.length) return;
+    setLoading(true);
+    setHasSearched(true);
+    const results = await browseByTags(tags);
+    setTracks(results);
+    setLoading(false);
+  };
 
   const handlePlay = (track) => {
     if (!track.preview_url) return;

@@ -2,9 +2,8 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const links = [
-  { to: '/music', label: 'Music' },
+  { to: '/', label: 'Discover' },
   { to: '/favorites', label: 'Favorites' },
-  { to: '/profile', label: 'Profile' },
 ];
 
 const Navbar = () => (
@@ -36,6 +35,7 @@ const Navbar = () => (
         <NavLink
           key={to}
           to={to}
+          end={to === '/'}
           style={({ isActive }) => ({
             display: 'inline-block',
             padding: '0.375rem 0.75rem',
