@@ -1,10 +1,23 @@
 import React from 'react';
-import { LuPlay, LuPause } from 'react-icons/lu';
+import { LuPlay, LuPause, LuDownload } from 'react-icons/lu';
+
+const handleDownload = (e, track) => {
+  e.stopPropagation();
+  const a = document.createElement('a');
+  a.href = track.downloadUrl;
+  a.download = `${track.name}.mp3`;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
 
 // Shared track row used by MusicPage, FavoritesPage, and playlist pages.
 // `children` renders the action buttons between the track info and the
 // play button (favorite toggle, add-to-playlist, remove, etc.) — each
-// page decides which actions make sense for it.
+// page decides which actions make sense for it. The download button is
+// handled here directly since it only depends on the track itself
+// (only rendered when the source has explicitly marked it downloadable).
 const TrackRow = ({ track, isCurrent, isCurrentlyPlaying, onPlay, children }) => (
   <div
     className={`track-row${isCurrent ? ' track-row--active' : ''}`}
@@ -44,6 +57,17 @@ const TrackRow = ({ track, isCurrent, isCurrentlyPlaying, onPlay, children }) =>
     </div>
 
     {children}
+
+    {track.downloadUrl && (
+      <button
+        className="icon-btn"
+        onClick={(e) => handleDownload(e, track)}
+        aria-label={`Download ${track.name}`}
+        title="Download"
+      >
+        <LuDownload size={14} />
+      </button>
+    )}
 
     <button
       className="row-play-btn"

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { rehydrateLocalTracks } from '../api/local/db';
 
 export const PlaylistsContext = createContext();
 
@@ -7,15 +8,27 @@ const genId = () => `pl_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 
 export const PlaylistsProvider = ({ children }) => {
   const [playlists, setPlaylists] = useState([]);
+  const [loaded, setLoaded] = useState(false);
 
+  // Refresh any local-file tracks' blob URLs from IndexedDB on load — the
+  // ones saved in localStorage went stale the moment the page unloaded.
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setPlaylists(JSON.parse(saved));
+    (async () => {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const rehydrated = await Promise.all(
+          parsed.map(async (p) => ({ ...p, tracks: await rehydrateLocalTracks(p.tracks) }))
+        );
+        setPlaylists(rehydrated);
+      }
+      setLoaded(true);
+    })();
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(playlists));
-  }, [playlists]);
+    if (loaded) localStorage.setItem(STORAGE_KEY, JSON.stringify(playlists));
+  }, [playlists, loaded]);
 
   const createPlaylist = (name) => {
     const id = genId();

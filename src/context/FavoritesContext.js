@@ -1,22 +1,29 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { rehydrateLocalTracks } from '../api/local/db';
 
 export const FavoritesContext = createContext();
 
 export const FavoritesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
+  const [loaded, setLoaded] = useState(false);
 
-  // Load favorites from localStorage on mount
+  // Load favorites from localStorage on mount, refreshing any local-file
+  // tracks' blob URLs from IndexedDB since the stored one is stale
   useEffect(() => {
-    const saved = localStorage.getItem('favorites');
-    if (saved) {
-      setFavorites(JSON.parse(saved));
-    }
+    (async () => {
+      const saved = localStorage.getItem('favorites');
+      if (saved) {
+        setFavorites(await rehydrateLocalTracks(JSON.parse(saved)));
+      }
+      setLoaded(true);
+    })();
   }, []);
 
-  // Save favorites to localStorage on change
+  // Save favorites to localStorage on change (skip the initial load so we
+  // don't immediately overwrite storage with an empty array before it's read)
   useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+    if (loaded) localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites, loaded]);
 
   const toggleFavorite = (track) => {
     setFavorites((prev) => {

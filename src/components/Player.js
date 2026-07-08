@@ -9,6 +9,7 @@ import {
 } from 'react-icons/lu';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
+import fallbackMark from '../images/ando-mark.png';
 
 const fmt = (s) => {
   if (!s || isNaN(s)) return '0:00';
@@ -228,7 +229,16 @@ const Player = () => {
                   preserveAspectRatio="xMidYMid slice"
                 />
               ) : (
-                <circle cx={RING/2} cy={RING/2} r={R-16} fill="#141414" />
+                <>
+                  <circle cx={RING/2} cy={RING/2} r={R-16} fill="#141414" />
+                  <image
+                    href={fallbackMark}
+                    x={RING/2 - (R-16) * 0.32} y={RING/2 - (R-16) * 0.32}
+                    width={(R-16) * 0.64} height={(R-16) * 0.64}
+                    opacity={0.55}
+                    preserveAspectRatio="xMidYMid meet"
+                  />
+                </>
               )}
             </svg>
             </div>
@@ -353,7 +363,12 @@ const Player = () => {
                 animation: isPlaying ? 'mini-art-pulse 2.4s ease-in-out infinite' : 'none',
               }} />
           ) : (
-            <div style={{ width: 42, height: 42, borderRadius: 8, background: '#1a1a1a', flexShrink: 0 }} />
+            <div style={{
+              width: 42, height: 42, borderRadius: 8, background: '#1a1a1a', flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <img src={fallbackMark} alt="" style={{ width: 20, height: 20, opacity: 0.5, objectFit: 'contain' }} />
+            </div>
           )}
 
           <div style={{ flex: 1, minWidth: 0 }}>

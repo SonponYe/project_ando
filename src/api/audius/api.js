@@ -23,6 +23,8 @@ const normalizeTrack = (t) => {
       images: art ? [{ url: art }] : [],
     },
     preview_url: `${BASE_URL}/tracks/${t.id}/stream?app_name=${APP_NAME}`,
+    // only set when the artist has explicitly allowed downloads
+    downloadUrl: t.is_downloadable ? `${BASE_URL}/tracks/${t.id}/download?app_name=${APP_NAME}` : null,
   };
 };
 

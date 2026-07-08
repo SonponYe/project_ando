@@ -23,6 +23,8 @@ const normalizeTrack = (item) => ({
     images: item.album_image ? [{ url: item.album_image }] : [],
   },
   preview_url: item.audio || null,
+  // only set when the artist's license explicitly permits downloads
+  downloadUrl: item.audiodownload_allowed ? item.audiodownload : null,
 });
 
 const handleError = (error, context) => {

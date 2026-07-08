@@ -6,6 +6,7 @@ const links = [
   { to: '/', label: 'Discover' },
   { to: '/favorites', label: 'Favorites' },
   { to: '/playlists', label: 'Playlists' },
+  { to: '/local', label: 'Local' },
 ];
 
 const Navbar = () => (
