@@ -25,21 +25,44 @@
         align-items: center;
         justify-content: center;
         background: linear-gradient(160deg, #141414 0%, #080808 100%);
+        animation: splash-fade-in 0.4s ease-out;
+      }
+      #boot-splash-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(210, 19, 19, 0.3) 0%, rgba(210, 19, 19, 0) 70%);
+        animation: glow-pulse 2.2s ease-in-out infinite;
+        pointer-events: none;
       }
       #boot-splash img {
+        position: relative;
+        z-index: 1;
         width: 44vw;
         max-width: 220px;
-        animation: boot-pulse 1.6s ease-in-out infinite;
+        animation: boot-pulse 1.8s ease-in-out infinite;
+      }
+      @keyframes splash-fade-in {
+        from { opacity: 0; }
+        to   { opacity: 1; }
       }
       @keyframes boot-pulse {
         0%, 100% { opacity: 0.85; transform: scale(1); }
-        50%      { opacity: 1;    transform: scale(1.035); }
+        50%      { opacity: 1;    transform: scale(1.045); }
+      }
+      @keyframes glow-pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(0.82); opacity: 0.45; }
+        50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="boot-splash">
+      <div id="boot-splash-glow"></div>
       <img src="%PUBLIC_URL%/ando-wordmark.png" alt="Ando" />
     </div>
     <div id="root"></div>

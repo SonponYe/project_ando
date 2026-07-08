@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
+import React, { useContext, useRef, useState, useEffect, useMemo } from 'react';
 import ReactHowler from 'react-howler';
 import {
   LuPlay, LuPause,
@@ -23,6 +23,24 @@ const fmt = (s) => {
 const RING = 264;
 const R    = 108;
 const CIRC = 2 * Math.PI * R;
+const WAVEFORM_BARS = 56;
+
+// Aggregate Jamendo's raw peak array (often 600+ points) down to a fixed
+// bar count, normalized to a 0–1 height fraction per bar.
+const downsampleWaveform = (peaks, barCount = WAVEFORM_BARS) => {
+  if (!peaks?.length) return [];
+  const max = Math.max(...peaks) || 1;
+  const chunkSize = peaks.length / barCount;
+  const bars = [];
+  for (let i = 0; i < barCount; i++) {
+    const start = Math.floor(i * chunkSize);
+    const end = Math.max(Math.floor((i + 1) * chunkSize), start + 1);
+    const chunk = peaks.slice(start, end);
+    const avg = chunk.reduce((a, b) => a + b, 0) / chunk.length;
+    bars.push(avg / max);
+  }
+  return bars;
+};
 
 const modeConfig = {
   order:       { icon: <LuRepeat size={13} />,  label: 'In Order' },
@@ -97,6 +115,22 @@ const Player = () => {
     howlerRef.current.seek(pos);
     setSeek(pos);
   };
+
+  const handleWaveformClick = (e) => {
+    if (!dur || !howlerRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const fraction = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const pos = fraction * dur;
+    howlerRef.current.seek(pos);
+    setSeek(pos);
+  };
+
+  const waveformBars = useMemo(
+    () => downsampleWaveform(currentTrack?.waveform),
+    // waveform is fixed per track, keyed by id
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentTrack?.id]
+  );
 
   if (!currentTrack) return null;
 
@@ -257,6 +291,35 @@ const Player = () => {
               )}
             </svg>
             </div>
+
+            {/* waveform seek (Jamendo tracks only — real peak data, not decorative) */}
+            {waveformBars.length > 0 && (
+              <div
+                onClick={handleWaveformClick}
+                role="slider"
+                aria-label="Seek (waveform)"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(progress * 100)}
+                style={{
+                  display: 'flex', alignItems: 'flex-end', gap: 2,
+                  width: '100%', height: 44, marginBottom: '1.25rem', cursor: 'pointer',
+                }}
+              >
+                {waveformBars.map((h, i) => {
+                  const played = i / waveformBars.length <= progress;
+                  return (
+                    <div key={i} style={{
+                      flex: 1,
+                      height: `${12 + h * 88}%`,
+                      borderRadius: 2,
+                      background: played ? 'linear-gradient(180deg, #e14b3f, #d21313)' : '#232323',
+                      transition: 'background 0.2s ease',
+                    }} />
+                  );
+                })}
+              </div>
+            )}
 
             {/* timestamps */}
             <div style={{

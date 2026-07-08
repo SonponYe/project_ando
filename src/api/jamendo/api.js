@@ -12,6 +12,18 @@ const baseParams = () => ({
   audioformat: 'mp32',
 });
 
+// Jamendo's `waveform` field is a JSON string like `{"peaks":[19,20,...]}` —
+// parse it to the raw peak array, or null if missing/malformed.
+const parseWaveform = (raw) => {
+  if (!raw) return null;
+  try {
+    const peaks = JSON.parse(raw).peaks;
+    return Array.isArray(peaks) && peaks.length ? peaks : null;
+  } catch {
+    return null;
+  }
+};
+
 // Normalize a Jamendo track into the shape the UI already expects
 // (mirrors the Spotify track object: id, name, artists[], album{}, preview_url)
 const normalizeTrack = (item) => ({
@@ -25,6 +37,7 @@ const normalizeTrack = (item) => ({
   preview_url: item.audio || null,
   // only set when the artist's license explicitly permits downloads
   downloadUrl: item.audiodownload_allowed ? item.audiodownload : null,
+  waveform: parseWaveform(item.waveform),
 });
 
 const handleError = (error, context) => {
