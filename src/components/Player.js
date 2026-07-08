@@ -5,6 +5,7 @@ import {
   LuHeart,
   LuChevronDown,
   LuSkipBack, LuSkipForward,
+  LuRepeat, LuRepeat1, LuShuffle,
 } from 'react-icons/lu';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
@@ -20,10 +21,17 @@ const RING = 264;
 const R    = 108;
 const CIRC = 2 * Math.PI * R;
 
+const modeConfig = {
+  order:       { icon: <LuRepeat size={13} />,  label: 'In Order' },
+  shuffle:     { icon: <LuShuffle size={13} />, label: 'Shuffle' },
+  'repeat-one': { icon: <LuRepeat1 size={13} />, label: 'Repeat' },
+};
+
 const Player = () => {
   const {
     currentTrack, isPlaying, playTrack, pauseTrack,
-    queue, currentIndex, nextTrack, prevTrack,
+    queue, currentIndex, nextTrack, prevTrack, canSkip,
+    playbackMode, cyclePlaybackMode, advanceAfterEnd,
   } = useContext(PlaybackContext);
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
 
@@ -31,8 +39,6 @@ const Player = () => {
   const [seek,     setSeek]     = useState(0);
   const [dur,      setDur]      = useState(0);
   const howlerRef = useRef(null);
-
-  const canSkip = queue.length > 1;
 
   // keyboard navigation while the now-playing screen is open
   useEffect(() => {
@@ -62,7 +68,18 @@ const Player = () => {
   const handleLoad = () => {
     if (howlerRef.current) setDur(howlerRef.current.duration() || 0);
   };
-  const handleEnd = () => { pauseTrack(); setSeek(0); };
+  const handleEnd = () => {
+    const result = advanceAfterEnd();
+    if (result === 'repeat') {
+      setSeek(0);
+      howlerRef.current?.seek(0);
+      howlerRef.current?.play();
+    } else if (!result) {
+      // no queue to advance through (single track) — just stop
+      pauseTrack();
+      setSeek(0);
+    }
+  };
 
   const handleRingClick = (e) => {
     if (!dur || !howlerRef.current) return;
@@ -219,11 +236,22 @@ const Player = () => {
             {/* timestamps */}
             <div style={{
               display: 'flex', justifyContent: 'space-between',
-              width: '100%', padding: '0 0.25rem', marginBottom: '2.5rem',
+              width: '100%', padding: '0 0.25rem', marginBottom: '1.25rem',
             }}>
               <span style={{ fontSize: '0.74rem', color: '#3a3a3a', fontVariantNumeric: 'tabular-nums' }}>{fmt(seek)}</span>
               <span style={{ fontSize: '0.74rem', color: '#3a3a3a', fontVariantNumeric: 'tabular-nums' }}>{fmt(dur)}</span>
             </div>
+
+            {/* playback mode */}
+            <button
+              onClick={cyclePlaybackMode}
+              aria-label={`Playback mode: ${modeConfig[playbackMode].label}. Click to change.`}
+              className={playbackMode !== 'order' ? 'chip chip--active' : 'chip'}
+              style={{ marginBottom: '1.25rem', gap: 6 }}
+            >
+              {modeConfig[playbackMode].icon}
+              {modeConfig[playbackMode].label}
+            </button>
 
             {/* controls */}
             <div style={{
