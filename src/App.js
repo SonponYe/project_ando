@@ -14,6 +14,7 @@ import FavoritesPage from './pages/FavoritesPage';
 import PlaylistsPage from './pages/PlaylistsPage';
 import PlaylistDetailPage from './pages/PlaylistDetailPage';
 import LocalLibraryPage from './pages/LocalLibraryPage';
+import RecentlyPlayedPage from './pages/RecentlyPlayedPage';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/playlists" element={<PlaylistsPage />} />
                 <Route path="/playlists/:id" element={<PlaylistDetailPage />} />
                 <Route path="/local" element={<LocalLibraryPage />} />
+                <Route path="/recent" element={<RecentlyPlayedPage />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
               <Player />

@@ -6,9 +6,11 @@ import {
   LuChevronDown,
   LuSkipBack, LuSkipForward,
   LuRepeat, LuRepeat1, LuShuffle,
+  LuListMusic, LuX,
 } from 'react-icons/lu';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
+import TrackRow from './TrackRow';
 import fallbackMark from '../images/ando-mark.png';
 
 const fmt = (s) => {
@@ -32,13 +34,15 @@ const Player = () => {
   const {
     currentTrack, isPlaying, playTrack, pauseTrack,
     queue, currentIndex, nextTrack, prevTrack, canSkip,
+    jumpToIndex, removeFromQueue,
     playbackMode, cyclePlaybackMode, advanceAfterEnd,
   } = useContext(PlaybackContext);
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
 
-  const [expanded, setExpanded] = useState(false);
-  const [seek,     setSeek]     = useState(0);
-  const [dur,      setDur]      = useState(0);
+  const [expanded,  setExpanded]  = useState(false);
+  const [showQueue, setShowQueue] = useState(false);
+  const [seek,      setSeek]      = useState(0);
+  const [dur,       setDur]       = useState(0);
   const howlerRef = useRef(null);
 
   // keyboard navigation while the now-playing screen is open
@@ -150,12 +154,23 @@ const Player = () => {
               }}>
                 Now Playing
               </span>
-              <span style={{
-                width: 32, textAlign: 'right',
-                fontSize: '0.7rem', color: '#333', fontVariantNumeric: 'tabular-nums',
-              }}>
-                {canSkip ? `${currentIndex + 1}/${queue.length}` : ''}
-              </span>
+              {canSkip ? (
+                <button
+                  onClick={() => setShowQueue(true)}
+                  aria-label="View queue"
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 5,
+                    color: '#333', fontSize: '0.7rem', fontVariantNumeric: 'tabular-nums',
+                    padding: '4px 2px',
+                  }}
+                >
+                  {currentIndex + 1}/{queue.length}
+                  <LuListMusic size={13} />
+                </button>
+              ) : (
+                <span style={{ width: 32 }} />
+              )}
             </div>
 
             {/* track name + artist */}
@@ -324,6 +339,68 @@ const Player = () => {
                 style={{ fill: favorited ? 'currentColor' : 'none', transition: 'fill 0.15s ease' }}
               />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── up next queue ── */}
+      {showQueue && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 10002,
+          background: 'linear-gradient(160deg, #181818 0%, #0a0a0a 55%, #060606 100%)',
+          overflowY: 'auto',
+        }}>
+          <div style={{ maxWidth: 460, margin: '0 auto', width: '100%', padding: '1.5rem 1.25rem 3rem' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem',
+            }}>
+              <span style={{
+                fontSize: '0.68rem', fontWeight: 600,
+                letterSpacing: '1.4px', textTransform: 'uppercase', color: '#383838',
+              }}>
+                Up Next
+              </span>
+              <button
+                onClick={() => setShowQueue(false)}
+                aria-label="Close queue"
+                style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', padding: 4 }}
+              >
+                <LuX size={18} />
+              </button>
+            </div>
+
+            {queue.map((_, offset) => {
+              const realIdx = (currentIndex + offset) % queue.length;
+              const track   = queue[realIdx];
+              const isNowPlaying = realIdx === currentIndex;
+
+              return (
+                <React.Fragment key={`${track.id}-${realIdx}`}>
+                  {offset === 0 && (
+                    <p className="section-label" style={{ marginBottom: '0.5rem' }}>Now Playing</p>
+                  )}
+                  {offset === 1 && (
+                    <p className="section-label" style={{ margin: '1rem 0 0.5rem' }}>Next Up</p>
+                  )}
+                  <TrackRow
+                    track={track}
+                    isCurrent={isNowPlaying}
+                    isCurrentlyPlaying={isNowPlaying && isPlaying}
+                    onPlay={() => { jumpToIndex(realIdx); setShowQueue(false); }}
+                  >
+                    {!isNowPlaying && (
+                      <button
+                        className="icon-btn"
+                        onClick={(e) => { e.stopPropagation(); removeFromQueue(realIdx); }}
+                        aria-label={`Remove ${track.name} from queue`}
+                      >
+                        <LuX size={13} />
+                      </button>
+                    )}
+                  </TrackRow>
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       )}

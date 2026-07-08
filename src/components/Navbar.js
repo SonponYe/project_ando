@@ -7,6 +7,7 @@ const links = [
   { to: '/favorites', label: 'Favorites' },
   { to: '/playlists', label: 'Playlists' },
   { to: '/local', label: 'Local' },
+  { to: '/recent', label: 'Recent' },
 ];
 
 const Navbar = () => (
@@ -28,7 +29,10 @@ const Navbar = () => (
       <img src={wordmark} alt="Ando" style={{ height: 20, width: 'auto', display: 'block' }} />
     </Link>
 
-    <div style={{ display: 'flex', gap: '0.125rem' }}>
+    <div style={{
+      display: 'flex', gap: '0.125rem',
+      overflowX: 'auto', scrollbarWidth: 'none',
+    }}>
       {links.map(({ to, label }) => (
         <NavLink
           key={to}
@@ -36,6 +40,7 @@ const Navbar = () => (
           end={to === '/'}
           style={({ isActive }) => ({
             display: 'inline-block',
+            flexShrink: 0,
             padding: '0.375rem 0.75rem',
             borderRadius: 8,
             fontSize: '0.85rem',
