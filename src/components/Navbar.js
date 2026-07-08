@@ -5,6 +5,7 @@ import wordmark from '../images/ando-wordmark.png';
 const links = [
   { to: '/', label: 'Discover' },
   { to: '/favorites', label: 'Favorites' },
+  { to: '/playlists', label: 'Playlists' },
 ];
 
 const Navbar = () => (

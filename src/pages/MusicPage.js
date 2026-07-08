@@ -1,8 +1,11 @@
 import React, { useState, useContext } from 'react';
-import { LuPlay, LuPause, LuHeart, LuSearch } from 'react-icons/lu';
-import { searchTracks, browseByTags } from '../api/jamendo/api';
+import { LuHeart, LuSearch } from 'react-icons/lu';
+import * as jamendo from '../api/jamendo/api';
+import * as audius from '../api/audius/api';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
+import TrackRow from '../components/TrackRow';
+import AddToPlaylistMenu from '../components/AddToPlaylistMenu';
 import mark from '../images/ando-mark.png';
 
 const MOODS  = ['Happy', 'Chill', 'Energetic', 'Sad', 'Focus'];
@@ -25,6 +28,17 @@ const GENRE_TAGS = {
   Electronic: 'electronic',
 };
 
+// Alternate results from two sources so neither catalog dominates the list
+const interleave = (a, b) => {
+  const out = [];
+  const max = Math.max(a.length, b.length);
+  for (let i = 0; i < max; i++) {
+    if (a[i]) out.push(a[i]);
+    if (b[i]) out.push(b[i]);
+  }
+  return out;
+};
+
 const MusicPage = () => {
   const [query,         setQuery]         = useState('');
   const [selectedMood,  setSelectedMood]  = useState('');
@@ -36,24 +50,28 @@ const MusicPage = () => {
   const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(PlaybackContext);
   const { toggleFavorite, isFavorite }                     = useContext(FavoritesContext);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const runSearch = async (jamendoResults, audiusQuery) => {
     setLoading(true);
     setHasSearched(true);
-    const results = await searchTracks(query);
-    setTracks(results);
+    const [jamendoTracks, audiusTracks] = await Promise.all([
+      jamendoResults,
+      audius.searchTracks(audiusQuery),
+    ]);
+    setTracks(interleave(jamendoTracks, audiusTracks));
     setLoading(false);
   };
 
-  const handleExplore = async () => {
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    runSearch(jamendo.searchTracks(query), query);
+  };
+
+  const handleExplore = () => {
     const tags = [MOOD_TAGS[selectedMood], GENRE_TAGS[selectedGenre]].filter(Boolean);
+    const plainQuery = [selectedMood, selectedGenre].filter(Boolean).join(' ');
     if (!tags.length) return;
-    setLoading(true);
-    setHasSearched(true);
-    const results = await browseByTags(tags);
-    setTracks(results);
-    setLoading(false);
+    runSearch(jamendo.browseByTags(tags), plainQuery);
   };
 
   const handlePlay = (track) => {
@@ -162,41 +180,13 @@ const MusicPage = () => {
             const favorited          = isFavorite(track.id);
 
             return (
-              <div
+              <TrackRow
                 key={track.id}
-                className={`track-row${isCurrent ? ' track-row--active' : ''}`}
-                onClick={() => handlePlay(track)}
+                track={track}
+                isCurrent={isCurrent}
+                isCurrentlyPlaying={isCurrentlyPlaying}
+                onPlay={() => handlePlay(track)}
               >
-                {track.album?.images?.[0]?.url ? (
-                  <img src={track.album.images[0].url} alt={track.name}
-                    style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
-                ) : (
-                  <div style={{ width: 48, height: 48, borderRadius: 8, background: '#191919', flexShrink: 0 }} />
-                )}
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: '0.4rem',
-                    fontSize: '0.88rem', fontWeight: 600,
-                    color: isCurrent ? '#efefef' : '#c8c8c8',
-                    lineHeight: 1.3,
-                  }}>
-                    {isCurrentlyPlaying && (
-                      <span className="eq-bars"><span /><span /><span /></span>
-                    )}
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {track.name}
-                    </span>
-                  </div>
-                  <div style={{
-                    fontSize: '0.76rem', color: '#444',
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2,
-                  }}>
-                    {track.artists?.map(a => a.name).join(', ')}
-                    {track.album?.name && <span style={{ color: '#303030' }}> · {track.album.name}</span>}
-                  </div>
-                </div>
-
                 <button
                   className={`icon-btn${favorited ? ' icon-btn--active' : ''}`}
                   onClick={e => { e.stopPropagation(); toggleFavorite(track); }}
@@ -205,20 +195,8 @@ const MusicPage = () => {
                 >
                   <LuHeart size={14} style={{ fill: favorited ? 'currentColor' : 'none' }} />
                 </button>
-
-                <button
-                  className="row-play-btn"
-                  onClick={e => { e.stopPropagation(); handlePlay(track); }}
-                  disabled={!track.preview_url}
-                  aria-label={isCurrentlyPlaying ? 'Pause' : 'Play'}
-                  style={{ opacity: isCurrent ? 1 : undefined }}
-                >
-                  {isCurrentlyPlaying
-                    ? <LuPause size={12} />
-                    : <LuPlay  size={12} style={{ marginLeft: 1 }} />
-                  }
-                </button>
-              </div>
+                <AddToPlaylistMenu track={track} />
+              </TrackRow>
             );
           })}
         </>
