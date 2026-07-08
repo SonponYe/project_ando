@@ -58,7 +58,7 @@ const MusicPage = () => {
   const handlePlay = (track) => {
     if (!track.preview_url) return;
     if (currentTrack?.id === track.id && isPlaying) pauseTrack();
-    else playTrack(track);
+    else playTrack(track, tracks);
   };
 
   return (

@@ -21,13 +21,30 @@ const R    = 108;
 const CIRC = 2 * Math.PI * R;
 
 const Player = () => {
-  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(PlaybackContext);
-  const { toggleFavorite, isFavorite }                     = useContext(FavoritesContext);
+  const {
+    currentTrack, isPlaying, playTrack, pauseTrack,
+    queue, currentIndex, nextTrack, prevTrack,
+  } = useContext(PlaybackContext);
+  const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
 
   const [expanded, setExpanded] = useState(false);
   const [seek,     setSeek]     = useState(0);
   const [dur,      setDur]      = useState(0);
   const howlerRef = useRef(null);
+
+  const canSkip = queue.length > 1;
+
+  // keyboard navigation while the now-playing screen is open
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight') nextTrack();
+      else if (e.key === 'ArrowLeft') prevTrack();
+      else if (e.key === 'Escape') setExpanded(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [expanded, nextTrack, prevTrack]);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -115,7 +132,12 @@ const Player = () => {
               }}>
                 Now Playing
               </span>
-              <div style={{ width: 32 }} />
+              <span style={{
+                width: 32, textAlign: 'right',
+                fontSize: '0.7rem', color: '#333', fontVariantNumeric: 'tabular-nums',
+              }}>
+                {canSkip ? `${currentIndex + 1}/${queue.length}` : ''}
+              </span>
             </div>
 
             {/* track name + artist */}
@@ -132,11 +154,24 @@ const Player = () => {
             </p>
 
             {/* ring + art */}
+            <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
+              {albumImg && (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  backgroundImage: `url(${albumImg})`,
+                  backgroundSize: 'cover', backgroundPosition: 'center',
+                  filter: 'blur(40px) saturate(1.4) brightness(0.7)',
+                  opacity: 0.35,
+                  transform: 'scale(0.85)',
+                  borderRadius: '50%',
+                  zIndex: 0,
+                }} />
+              )}
             <svg
               width={RING} height={RING}
               viewBox={`0 0 ${RING} ${RING}`}
               onClick={handleRingClick}
-              style={{ cursor: dur ? 'pointer' : 'default', maxWidth: '100%', marginBottom: '1.25rem' }}
+              style={{ cursor: dur ? 'pointer' : 'default', maxWidth: '100%', position: 'relative', zIndex: 1 }}
               aria-label="Seek"
             >
               <defs>
@@ -175,6 +210,7 @@ const Player = () => {
                 <circle cx={RING/2} cy={RING/2} r={R-16} fill="#141414" />
               )}
             </svg>
+            </div>
 
             {/* timestamps */}
             <div style={{
@@ -190,7 +226,14 @@ const Player = () => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               gap: '2.25rem', marginBottom: '2.5rem',
             }}>
-              <button disabled aria-label="Previous" style={ghostCtrl}>
+              <button
+                onClick={prevTrack}
+                disabled={!canSkip}
+                aria-label="Previous track"
+                style={canSkip ? skipCtrl : ghostCtrl}
+                onMouseEnter={e => { if (canSkip) e.currentTarget.style.color = '#efefef'; }}
+                onMouseLeave={e => { if (canSkip) e.currentTarget.style.color = '#888'; }}
+              >
                 <LuSkipBack size={20} />
               </button>
 
@@ -208,7 +251,14 @@ const Player = () => {
                 }
               </button>
 
-              <button disabled aria-label="Next" style={ghostCtrl}>
+              <button
+                onClick={nextTrack}
+                disabled={!canSkip}
+                aria-label="Next track"
+                style={canSkip ? skipCtrl : ghostCtrl}
+                onMouseEnter={e => { if (canSkip) e.currentTarget.style.color = '#efefef'; }}
+                onMouseLeave={e => { if (canSkip) e.currentTarget.style.color = '#888'; }}
+              >
                 <LuSkipForward size={20} />
               </button>
             </div>
@@ -326,6 +376,12 @@ const ghostCtrl = {
   background: 'none', border: 'none',
   color: '#282828', cursor: 'not-allowed',
   padding: 8, opacity: 0.5,
+};
+
+const skipCtrl = {
+  background: 'none', border: 'none',
+  color: '#888', cursor: 'pointer',
+  padding: 8, transition: 'color 0.15s ease',
 };
 
 export default Player;
