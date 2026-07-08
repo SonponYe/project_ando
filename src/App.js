@@ -5,6 +5,7 @@ import { FavoritesProvider } from './context/FavoritesContext';
 
 import Navbar from './components/Navbar';
 import Player from './components/Player';
+import PwaBanners from './components/PwaBanners';
 
 import MusicPage from './pages/MusicPage';
 import FavoritesPage from './pages/FavoritesPage';
@@ -14,6 +15,7 @@ function App() {
     <PlaybackProvider>
       <FavoritesProvider>
         <Router>
+          <PwaBanners />
           <Navbar />
           <Routes>
             <Route path="/" element={<MusicPage />} />

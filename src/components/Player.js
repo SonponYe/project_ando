@@ -178,6 +178,10 @@ const Player = () => {
                 <clipPath id="np-art">
                   <circle cx={RING/2} cy={RING/2} r={R - 16} />
                 </clipPath>
+                <linearGradient id="progress-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#e14b3f" />
+                  <stop offset="100%" stopColor="#d21313" />
+                </linearGradient>
               </defs>
 
               {/* track bg */}
@@ -186,7 +190,7 @@ const Player = () => {
 
               {/* progress */}
               <circle cx={RING/2} cy={RING/2} r={R}
-                fill="none" stroke="#505050" strokeWidth={2.5}
+                fill="none" stroke="url(#progress-grad)" strokeWidth={2.5}
                 strokeLinecap="round"
                 strokeDasharray={CIRC}
                 strokeDashoffset={dashOffset}
@@ -195,7 +199,7 @@ const Player = () => {
 
               {/* scrubber dot */}
               {dur > 0 && (
-                <circle cx={dotX} cy={dotY} r={5} fill="#888888" />
+                <circle cx={dotX} cy={dotY} r={5.5} fill="#e14b3f" />
               )}
 
               {albumImg ? (
@@ -309,7 +313,8 @@ const Player = () => {
           <div style={{
             position: 'absolute', top: 0, left: 0, height: 2,
             width: `${progress * 100}%`,
-            background: 'linear-gradient(90deg, #444, #ccc)',
+            background: 'linear-gradient(90deg, #6b0f0f, #e14b3f)',
+            boxShadow: '0 0 8px rgba(226, 35, 26, 0.5)',
             transition: isPlaying ? 'width 0.25s linear' : 'none',
           }} />
 
