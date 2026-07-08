@@ -1,5 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
+import wordmark from '../images/ando-wordmark.png';
 
 const links = [
   { to: '/', label: 'Discover' },
@@ -21,14 +22,9 @@ const Navbar = () => (
     alignItems: 'center',
     justifyContent: 'space-between',
   }}>
-    <span style={{
-      fontWeight: 800,
-      fontSize: '1.05rem',
-      color: '#f0f0f0',
-      letterSpacing: '-0.5px',
-    }}>
-      ando
-    </span>
+    <Link to="/" aria-label="Ando home" style={{ display: 'flex', alignItems: 'center' }}>
+      <img src={wordmark} alt="Ando" style={{ height: 20, width: 'auto', display: 'block' }} />
+    </Link>
 
     <div style={{ display: 'flex', gap: '0.125rem' }}>
       {links.map(({ to, label }) => (

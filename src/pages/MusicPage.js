@@ -3,6 +3,7 @@ import { LuPlay, LuPause, LuHeart, LuSearch } from 'react-icons/lu';
 import { searchTracks, browseByTags } from '../api/jamendo/api';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
+import mark from '../images/ando-mark.png';
 
 const MOODS  = ['Happy', 'Chill', 'Energetic', 'Sad', 'Focus'];
 const GENRES = ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Afrobeats', 'Electronic'];
@@ -134,6 +135,12 @@ const MusicPage = () => {
       )}
       {!loading && !hasSearched && (
         <div className="state-center">
+          <img
+            src={mark}
+            alt=""
+            aria-hidden="true"
+            style={{ width: 40, height: 40, opacity: 0.35, filter: 'grayscale(1)', marginBottom: '0.5rem' }}
+          />
           <p>Search for something</p>
           <p>Use the bar above or pick a mood and genre</p>
         </div>

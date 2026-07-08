@@ -373,7 +373,7 @@ const playCtrl = {
   background: '#ececec', border: 'none', color: '#111',
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   cursor: 'pointer', padding: 0, flexShrink: 0,
-  boxShadow: '0 8px 28px rgba(0,0,0,0.6)',
+  boxShadow: '0 8px 28px rgba(210, 19, 19, 0.28), 0 8px 20px rgba(0,0,0,0.5)',
   transition: 'background 0.15s ease, color 0.15s ease',
 };
 
