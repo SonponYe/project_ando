@@ -8,6 +8,7 @@ const links = [
   { to: '/playlists', label: 'Playlists' },
   { to: '/local', label: 'Local' },
   { to: '/recent', label: 'Recent' },
+  { to: '/stats', label: 'Stats' },
 ];
 
 const Navbar = () => (

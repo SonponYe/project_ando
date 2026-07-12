@@ -47,3 +47,16 @@ export const searchTracks = async (query) => {
     return [];
   }
 };
+
+// Audius' trending chart (this week) — powers the home page rails
+export const getTrendingTracks = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/tracks/trending`, {
+      params: { time: 'week', app_name: APP_NAME },
+    });
+    return (res.data.data || []).map(normalizeTrack);
+  } catch (err) {
+    handleError(err, 'Trending Tracks');
+    return [];
+  }
+};

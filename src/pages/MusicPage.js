@@ -1,12 +1,14 @@
-import React, { useState, useContext } from 'react';
-import { LuHeart, LuSearch } from 'react-icons/lu';
+import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { LuHeart, LuSearch, LuArrowLeft } from 'react-icons/lu';
 import * as jamendo from '../api/jamendo/api';
 import * as audius from '../api/audius/api';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 import TrackRow from '../components/TrackRow';
+import TrackCard from '../components/TrackCard';
 import AddToPlaylistMenu from '../components/AddToPlaylistMenu';
-import mark from '../images/ando-mark.png';
+import { computeStats } from '../lib/stats';
 
 const MOODS  = ['Happy', 'Chill', 'Energetic', 'Sad', 'Focus'];
 const GENRES = ['Pop', 'Rock', 'Hip-Hop', 'Jazz', 'Afrobeats', 'Electronic'];
@@ -28,6 +30,8 @@ const GENRE_TAGS = {
   Electronic: 'electronic',
 };
 
+const RAIL_SIZE = 14;
+
 // Alternate results from two sources so neither catalog dominates the list
 const interleave = (a, b) => {
   const out = [];
@@ -39,6 +43,34 @@ const interleave = (a, b) => {
   return out;
 };
 
+const dedupeById = (tracks) => {
+  const seen = new Set();
+  return tracks.filter((t) => (seen.has(t.id) ? false : seen.add(t.id)));
+};
+
+// Section wrapper for a horizontally scrolling row of cards
+const Rail = ({ title, action, children }) => (
+  <section style={{ marginBottom: '1.75rem' }}>
+    <div className="rail-head">
+      <h2>{title}</h2>
+      {action}
+    </div>
+    <div className="rail">{children}</div>
+  </section>
+);
+
+const RailSkeleton = () => (
+  <>
+    {Array.from({ length: 6 }, (_, i) => (
+      <div key={i} className="track-card track-card--skel" aria-hidden="true">
+        <div className="track-card__art" />
+        <div className="skel-line" />
+        <div className="skel-line" />
+      </div>
+    ))}
+  </>
+);
+
 const MusicPage = () => {
   const [query,         setQuery]         = useState('');
   const [selectedMood,  setSelectedMood]  = useState('');
@@ -46,9 +78,58 @@ const MusicPage = () => {
   const [tracks,        setTracks]        = useState([]);
   const [loading,       setLoading]       = useState(false);
   const [hasSearched,   setHasSearched]   = useState(false);
+  const [trending,      setTrending]      = useState(null); // null = still loading
+  const [madeForYou,    setMadeForYou]    = useState(null);
 
-  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(PlaybackContext);
-  const { toggleFavorite, isFavorite }                     = useContext(FavoritesContext);
+  const {
+    currentTrack, isPlaying, playTrack, pauseTrack,
+    recentlyPlayed, playLog,
+  } = useContext(PlaybackContext);
+  const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
+
+  const stats = useMemo(() => computeStats(playLog), [playLog]);
+
+  // Trending rail: both sources' weekly charts, interleaved
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [jam, aud] = await Promise.all([
+        jamendo.getPopularTracks(),
+        audius.getTrendingTracks(),
+      ]);
+      if (!cancelled) setTrending(dedupeById(interleave(jam, aud)).slice(0, RAIL_SIZE));
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // "Made for you" rail: more tracks from the user's most-played artists.
+  // Seeded once per visit (not on every play) so the rail doesn't reshuffle
+  // under the user mid-session.
+  const seeded = useRef(false);
+  useEffect(() => {
+    if (seeded.current) return;
+    seeded.current = true;
+    const topArtists = computeStats(playLog, { topCount: 2 }).topArtists;
+    if (!topArtists.length) {
+      setMadeForYou([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const playedIds = new Set(playLog.map((ev) => ev.id));
+      const results = await Promise.all(
+        topArtists.flatMap(({ event }) => [
+          jamendo.searchTracks(event.artist),
+          audius.searchTracks(event.artist),
+        ]),
+      );
+      const merged = dedupeById(results.reduce(interleave, []))
+        .filter((t) => !playedIds.has(t.id)) // keep it fresh — skip what they've already heard
+        .slice(0, RAIL_SIZE);
+      if (!cancelled) setMadeForYou(merged);
+    })();
+    return () => { cancelled = true; };
+  }, [playLog]);
 
   const runSearch = async (jamendoResults, audiusQuery) => {
     setLoading(true);
@@ -74,11 +155,30 @@ const MusicPage = () => {
     runSearch(jamendo.browseByTags(tags), plainQuery);
   };
 
-  const handlePlay = (track) => {
+  const backToHome = () => {
+    setHasSearched(false);
+    setTracks([]);
+    setQuery('');
+    setSelectedMood('');
+    setSelectedGenre('');
+  };
+
+  // Play a track with `list` as the queue; tapping the playing track pauses it
+  const handlePlay = (track, list) => {
     if (!track.preview_url) return;
     if (currentTrack?.id === track.id && isPlaying) pauseTrack();
-    else playTrack(track, tracks);
+    else playTrack(track, list);
   };
+
+  const renderCards = (list) => list.map((track) => (
+    <TrackCard
+      key={track.id}
+      track={track}
+      isCurrent={currentTrack?.id === track.id}
+      isCurrentlyPlaying={currentTrack?.id === track.id && isPlaying}
+      onPlay={() => handlePlay(track, list)}
+    />
+  ));
 
   return (
     <div className="page-wrap">
@@ -144,23 +244,68 @@ const MusicPage = () => {
         </button>
       )}
 
-      {/* states */}
+      {/* ── Home sections (shown until a search happens) ── */}
+      {!hasSearched && (
+        <>
+          {/* listening stats strip */}
+          {stats.totalPlays > 0 && (
+            <section style={{ marginBottom: '1.75rem' }}>
+              <div className="rail-head">
+                <h2>Your listening</h2>
+                <Link to="/stats">See all stats →</Link>
+              </div>
+              <div className="stat-grid">
+                <div className="stat-tile">
+                  <div className="stat-tile__value">{stats.playsThisWeek}</div>
+                  <div className="stat-tile__label">Plays this week</div>
+                </div>
+                <div className="stat-tile">
+                  <div className="stat-tile__value">
+                    {stats.streak} day{stats.streak !== 1 ? 's' : ''}
+                  </div>
+                  <div className="stat-tile__label">Listening streak</div>
+                </div>
+                <div className="stat-tile">
+                  <div className="stat-tile__value">
+                    {stats.topArtists[0]?.event.artist || '—'}
+                  </div>
+                  <div className="stat-tile__label">Top artist</div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* jump back in */}
+          {recentlyPlayed.length > 0 && (
+            <Rail
+              title="Jump back in"
+              action={<Link to="/recent">See all →</Link>}
+            >
+              {renderCards(recentlyPlayed.slice(0, RAIL_SIZE))}
+            </Rail>
+          )}
+
+          {/* made for you — seeded from most-played artists */}
+          {(madeForYou === null || madeForYou.length > 0) && stats.totalPlays > 0 && (
+            <Rail title="Made for you">
+              {madeForYou === null ? <RailSkeleton /> : renderCards(madeForYou)}
+            </Rail>
+          )}
+
+          {/* trending */}
+          {(trending === null || trending.length > 0) && (
+            <Rail title="Trending now">
+              {trending === null ? <RailSkeleton /> : renderCards(trending)}
+            </Rail>
+          )}
+        </>
+      )}
+
+      {/* ── Search states ── */}
       {loading && (
         <div className="state-center">
           <p>Finding tracks</p>
           <p>Just a moment...</p>
-        </div>
-      )}
-      {!loading && !hasSearched && (
-        <div className="state-center">
-          <img
-            src={mark}
-            alt=""
-            aria-hidden="true"
-            style={{ width: 40, height: 40, opacity: 0.35, filter: 'grayscale(1)', marginBottom: '0.5rem' }}
-          />
-          <p>Search for something</p>
-          <p>Use the bar above or pick a mood and genre</p>
         </div>
       )}
       {!loading && hasSearched && tracks.length === 0 && (
@@ -170,10 +315,16 @@ const MusicPage = () => {
         </div>
       )}
 
-      {/* track list */}
-      {!loading && tracks.length > 0 && (
+      {/* search results */}
+      {!loading && hasSearched && tracks.length > 0 && (
         <>
-          <p className="section-label" style={{ marginBottom: '0.75rem' }}>{tracks.length} tracks</p>
+          <div className="rail-head" style={{ marginBottom: '0.75rem' }}>
+            <p className="section-label" style={{ marginBottom: 0 }}>{tracks.length} tracks</p>
+            <button onClick={backToHome}>
+              <LuArrowLeft size={11} style={{ marginRight: 4, verticalAlign: -1 }} />
+              Back to home
+            </button>
+          </div>
           {tracks.map((track) => {
             const isCurrent          = currentTrack?.id === track.id;
             const isCurrentlyPlaying = isCurrent && isPlaying;
@@ -185,7 +336,7 @@ const MusicPage = () => {
                 track={track}
                 isCurrent={isCurrent}
                 isCurrentlyPlaying={isCurrentlyPlaying}
-                onPlay={() => handlePlay(track)}
+                onPlay={() => handlePlay(track, tracks)}
               >
                 <button
                   className={`icon-btn${favorited ? ' icon-btn--active' : ''}`}

@@ -64,6 +64,23 @@ export const searchTracks = async (query) => {
   }
 };
 
+// Most-played tracks on Jamendo this week — powers the home page rails
+export const getPopularTracks = async () => {
+  if (!CLIENT_ID) {
+    console.warn('[Jamendo API] Missing REACT_APP_JAMENDO_CLIENT_ID');
+    return [];
+  }
+  try {
+    const res = await axios.get(`${BASE_URL}/tracks/`, {
+      params: { ...baseParams(), order: 'popularity_week' },
+    });
+    return res.data.results.map(normalizeTrack);
+  } catch (err) {
+    handleError(err, 'Popular Tracks');
+    return [];
+  }
+};
+
 export const browseByTags = async (tags) => {
   if (!CLIENT_ID) {
     console.warn('[Jamendo API] Missing REACT_APP_JAMENDO_CLIENT_ID');

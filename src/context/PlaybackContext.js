@@ -6,6 +6,20 @@ export const PlaybackContext = createContext();
 const MODES = ['order', 'shuffle', 'repeat-one'];
 const RECENT_KEY = 'ando_recently_played';
 const RECENT_LIMIT = 50;
+const PLAYLOG_KEY = 'ando_play_log';
+const PLAYLOG_LIMIT = 2000;
+
+// Compact per-play event kept for listening stats. Stores just enough to
+// rank/replay a track later — not the whole track object (waveform arrays
+// alone would blow up localStorage).
+const toPlayEvent = (track) => ({
+  id: track.id,
+  name: track.name,
+  artist: track.artists?.map((a) => a.name).join(', ') || 'Unknown Artist',
+  image: track.album?.images?.[0]?.url || null,
+  preview_url: track.preview_url || null,
+  ts: Date.now(),
+});
 
 export const PlaybackProvider = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState(null);
@@ -14,6 +28,13 @@ export const PlaybackProvider = ({ children }) => {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [playbackMode, setPlaybackMode] = useState('order'); // 'order' | 'shuffle' | 'repeat-one'
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
+  const [playLog, setPlayLog] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(PLAYLOG_KEY)) || [];
+    } catch {
+      return [];
+    }
+  });
 
   // Load recently-played history, refreshing any local-file tracks' blob
   // URLs from IndexedDB since the ones saved in localStorage are stale
@@ -26,22 +47,30 @@ export const PlaybackProvider = ({ children }) => {
 
   const recordPlay = useCallback((track) => {
     setRecentlyPlayed((prev) => [track, ...prev.filter((t) => t.id !== track.id)].slice(0, RECENT_LIMIT));
+    setPlayLog((prev) => [toPlayEvent(track), ...prev].slice(0, PLAYLOG_LIMIT));
   }, []);
 
   useEffect(() => {
     localStorage.setItem(RECENT_KEY, JSON.stringify(recentlyPlayed));
   }, [recentlyPlayed]);
 
+  useEffect(() => {
+    localStorage.setItem(PLAYLOG_KEY, JSON.stringify(playLog));
+  }, [playLog]);
+
   const clearRecentlyPlayed = () => setRecentlyPlayed([]);
+  const clearPlayLog = () => setPlayLog([]);
 
   // Central "start playing this track at this queue index" — everything
   // that changes the current track funnels through here so recently-played
-  // tracking and playback state stay in sync in one place.
+  // tracking and playback state stay in sync in one place. Resuming the
+  // already-loaded track isn't a new play, so it isn't re-recorded (that
+  // would inflate the listening stats on every pause/resume).
   const setNowPlaying = (track, idx) => {
     setCurrentIndex(idx);
     setCurrentTrack(track);
     setIsPlaying(true);
-    recordPlay(track);
+    if (currentTrack?.id !== track.id) recordPlay(track);
   };
 
   // Play a track. Pass `trackList` (the list it was played from) to load
@@ -164,6 +193,7 @@ export const PlaybackProvider = ({ children }) => {
       jumpToIndex, removeFromQueue,
       playbackMode, cyclePlaybackMode, advanceAfterEnd,
       recentlyPlayed, clearRecentlyPlayed,
+      playLog, clearPlayLog,
     }}>
       {children}
     </PlaybackContext.Provider>
