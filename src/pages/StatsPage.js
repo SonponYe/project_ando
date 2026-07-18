@@ -1,8 +1,12 @@
 import React, { useContext, useMemo, useState, useEffect } from 'react';
-import { LuHeart, LuTrash2 } from 'react-icons/lu';
+import {
+  LuHeart, LuTrash2,
+  LuActivity, LuHeadphones, LuUsers, LuFlame,
+} from 'react-icons/lu';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 import TrackRow from '../components/TrackRow';
+import PageHeader from '../components/PageHeader';
 import AddToPlaylistMenu from '../components/AddToPlaylistMenu';
 import { computeStats, eventToTrack } from '../lib/stats';
 import { rehydrateLocalTrack } from '../api/local/db';
@@ -29,6 +33,34 @@ const useTopTracks = (topTracks) => {
   return resolved;
 };
 
+const StatTile = ({ icon, value, label }) => (
+  <div className="stat-tile">
+    <div className="stat-tile__icon">{icon}</div>
+    <div className="stat-tile__value">{value}</div>
+    <div className="stat-tile__label">{label}</div>
+  </div>
+);
+
+// Round artist thumbnail — freshest album art we have for them, falling
+// back to their initial on a plain surface.
+const ArtistThumb = ({ event }) => (
+  event.image ? (
+    <img
+      src={event.image}
+      alt=""
+      style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+    />
+  ) : (
+    <div style={{
+      width: 38, height: 38, borderRadius: '50%', background: 'var(--surface-2)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: '0.85rem', fontWeight: 700, color: '#555', flexShrink: 0,
+    }}>
+      {event.artist.charAt(0).toUpperCase()}
+    </div>
+  )
+);
+
 const StatsPage = () => {
   const {
     currentTrack, isPlaying, playTrack, pauseTrack,
@@ -41,6 +73,7 @@ const StatsPage = () => {
   const maxDay = Math.max(...stats.daily.map((d) => d.count), 1);
   const maxArtist = stats.topArtists[0]?.count || 1;
   const todayIdx = stats.daily.length - 1;
+  const busiest = stats.daily.reduce((a, b) => (b.count > a.count ? b : a));
 
   const handlePlay = (track) => {
     if (!track.preview_url) return;
@@ -50,32 +83,22 @@ const StatsPage = () => {
 
   return (
     <div className="page-wrap">
-      {/* heading */}
-      <div style={{
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-        marginBottom: '2rem', gap: '1rem',
-      }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#efefef', letterSpacing: '-0.5px', marginBottom: '0.2rem' }}>
-            Your Stats
-          </h1>
-          <p style={{ color: '#383838', fontSize: '0.82rem' }}>
-            {stats.totalPlays > 0
-              ? `Based on ${stats.totalPlays} play${stats.totalPlays !== 1 ? 's' : ''}`
-              : 'Your listening habits, once you start playing'}
-          </p>
-        </div>
-        {stats.totalPlays > 0 && (
+      <PageHeader
+        title="Your Stats"
+        subtitle={stats.totalPlays > 0
+          ? `Based on ${stats.totalPlays} play${stats.totalPlays !== 1 ? 's' : ''}`
+          : 'Your listening habits, once you start playing'}
+        action={stats.totalPlays > 0 && (
           <button
             className="btn-ghost"
             onClick={clearPlayLog}
-            style={{ flexShrink: 0, padding: '0.4rem 0.8rem', fontSize: '0.78rem' }}
+            style={{ padding: '0.4rem 0.8rem', fontSize: '0.78rem' }}
           >
             <LuTrash2 size={13} style={{ marginRight: 6 }} />
             Reset
           </button>
         )}
-      </div>
+      />
 
       {stats.totalPlays === 0 ? (
         <div className="state-center">
@@ -85,28 +108,30 @@ const StatsPage = () => {
       ) : (
         <>
           {/* stat tiles */}
-          <div className="stat-grid" style={{ marginBottom: '2rem' }}>
-            <div className="stat-tile">
-              <div className="stat-tile__value">{stats.playsThisWeek}</div>
-              <div className="stat-tile__label">Plays this week</div>
-            </div>
-            <div className="stat-tile">
-              <div className="stat-tile__value">{stats.totalPlays}</div>
-              <div className="stat-tile__label">All-time plays</div>
-            </div>
-            <div className="stat-tile">
-              <div className="stat-tile__value">{stats.uniqueArtists}</div>
-              <div className="stat-tile__label">Artists explored</div>
-            </div>
-            <div className="stat-tile">
-              <div className="stat-tile__value">{stats.streak}</div>
-              <div className="stat-tile__label">Day streak</div>
-            </div>
+          <div className="stat-grid" style={{ marginBottom: '1.5rem' }}>
+            <StatTile icon={<LuActivity size={14} />} value={stats.playsThisWeek} label="Plays this week" />
+            <StatTile icon={<LuHeadphones size={14} />} value={stats.totalPlays} label="All-time plays" />
+            <StatTile icon={<LuUsers size={14} />} value={stats.uniqueArtists} label="Artists explored" />
+            <StatTile
+              icon={<LuFlame size={14} />}
+              value={`${stats.streak} day${stats.streak !== 1 ? 's' : ''}`}
+              label="Listening streak"
+            />
           </div>
 
           {/* last 7 days activity */}
-          <section style={{ marginBottom: '2.25rem' }}>
-            <p className="section-label">This week's activity</p>
+          <section className="stats-card" style={{ marginBottom: '2rem' }}>
+            <div style={{
+              display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+              gap: '1rem', marginBottom: '0.5rem',
+            }}>
+              <p className="section-label" style={{ marginBottom: 0 }}>This week's activity</p>
+              {busiest.count > 0 && (
+                <span style={{ fontSize: '0.72rem', color: '#4a4a4a' }}>
+                  Busiest: {busiest.label} · {busiest.count} play{busiest.count !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
             <div
               className="week-chart"
               role="img"
@@ -173,6 +198,7 @@ const StatsPage = () => {
               {stats.topArtists.map(({ event, count }, i) => (
                 <div key={event.artist} className="rank-row">
                   <span className="rank-row__num">{i + 1}</span>
+                  <ArtistThumb event={event} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
                       display: 'flex', justifyContent: 'space-between', gap: '0.75rem',

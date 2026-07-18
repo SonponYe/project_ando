@@ -4,6 +4,7 @@ import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 import { LocalLibraryContext } from '../context/LocalLibraryContext';
 import TrackRow from '../components/TrackRow';
+import PageHeader from '../components/PageHeader';
 import AddToPlaylistMenu from '../components/AddToPlaylistMenu';
 
 const LocalLibraryPage = () => {
@@ -31,16 +32,12 @@ const LocalLibraryPage = () => {
 
   return (
     <div className="page-wrap">
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#efefef', letterSpacing: '-0.5px', marginBottom: '0.2rem' }}>
-          Local Files
-        </h1>
-        <p style={{ color: '#383838', fontSize: '0.82rem' }}>
-          {tracks.length > 0
-            ? `${tracks.length} imported track${tracks.length !== 1 ? 's' : ''} · stored on this device`
-            : 'Import audio files from this device'}
-        </p>
-      </div>
+      <PageHeader
+        title="Local Files"
+        subtitle={tracks.length > 0
+          ? `${tracks.length} imported track${tracks.length !== 1 ? 's' : ''} · stored on this device`
+          : 'Import audio files from this device'}
+      />
 
       <input
         ref={fileInputRef}

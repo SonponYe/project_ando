@@ -28,6 +28,12 @@ export const PlaybackProvider = ({ children }) => {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [playbackMode, setPlaybackMode] = useState('order'); // 'order' | 'shuffle' | 'repeat-one'
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
+  // Per-track play count: id -> total times the track should play before the
+  // queue advances (absent = 1, i.e. no repeat). Session-only by design.
+  const [trackRepeats, setTrackRepeats] = useState({});
+  // How many replays the *current* playthrough still owes. A ref, not state —
+  // it changes as tracks end, and nothing needs to re-render off it.
+  const repeatsLeftRef = useRef(0);
   const [playLog, setPlayLog] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(PLAYLOG_KEY)) || [];
@@ -70,7 +76,21 @@ export const PlaybackProvider = ({ children }) => {
     setCurrentIndex(idx);
     setCurrentTrack(track);
     setIsPlaying(true);
+    repeatsLeftRef.current = (trackRepeats[track.id] || 1) - 1;
     if (currentTrack?.id !== track.id) recordPlay(track);
+  };
+
+  // Set how many times a track plays before the queue moves on (1–9).
+  // Updating the currently playing track restarts its countdown.
+  const setTrackRepeat = (id, count) => {
+    const c = Math.max(1, Math.min(9, count));
+    setTrackRepeats((prev) => {
+      const next = { ...prev };
+      if (c <= 1) delete next[id];
+      else next[id] = c;
+      return next;
+    });
+    if (currentTrack?.id === id) repeatsLeftRef.current = c - 1;
   };
 
   // Play a track. Pass `trackList` (the list it was played from) to load
@@ -137,10 +157,15 @@ export const PlaybackProvider = ({ children }) => {
     setCurrentIndex((prev) => (idx < prev ? prev - 1 : prev));
   };
 
-  // Called when the current track finishes playing naturally, respecting
-  // the active playback mode. Returns true if playback should continue.
+  // Called when the current track finishes playing naturally. Priority:
+  // repeat-one mode (endless) > the track's own play count > the active
+  // playback mode. Returns true/'repeat' if playback should continue.
   const advanceAfterEnd = () => {
     if (playbackMode === 'repeat-one') return 'repeat';
+    if (repeatsLeftRef.current > 0) {
+      repeatsLeftRef.current -= 1;
+      return 'repeat';
+    }
     if (playbackMode === 'shuffle') return stepRandom();
     return stepSequential(1);
   };
@@ -192,6 +217,7 @@ export const PlaybackProvider = ({ children }) => {
       queue, currentIndex, nextTrack, prevTrack, canSkip,
       jumpToIndex, removeFromQueue,
       playbackMode, cyclePlaybackMode, advanceAfterEnd,
+      trackRepeats, setTrackRepeat,
       recentlyPlayed, clearRecentlyPlayed,
       playLog, clearPlayLog,
     }}>

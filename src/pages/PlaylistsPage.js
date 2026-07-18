@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LuPlus, LuTrash2, LuListMusic } from 'react-icons/lu';
 import { PlaylistsContext } from '../context/PlaylistsContext';
+import PageHeader from '../components/PageHeader';
 
 const PlaylistsPage = () => {
   const { playlists, createPlaylist, deletePlaylist } = useContext(PlaylistsContext);
@@ -25,16 +26,12 @@ const PlaylistsPage = () => {
 
   return (
     <div className="page-wrap">
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#efefef', letterSpacing: '-0.5px', marginBottom: '0.2rem' }}>
-          Playlists
-        </h1>
-        <p style={{ color: '#383838', fontSize: '0.82rem' }}>
-          {playlists.length > 0
-            ? `${playlists.length} playlist${playlists.length !== 1 ? 's' : ''}`
-            : 'Create your first playlist'}
-        </p>
-      </div>
+      <PageHeader
+        title="Playlists"
+        subtitle={playlists.length > 0
+          ? `${playlists.length} playlist${playlists.length !== 1 ? 's' : ''}`
+          : 'Create your first playlist'}
+      />
 
       <form onSubmit={handleCreate} style={{ display: 'flex', gap: '0.6rem', marginBottom: '2rem' }}>
         <input

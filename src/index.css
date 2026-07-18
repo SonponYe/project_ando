@@ -538,11 +538,25 @@ input, select {
 }
 
 .stat-tile {
+  position: relative;
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0.9rem 1rem;
   min-width: 0;
+  transition: border-color 0.2s ease;
+}
+
+.stat-tile:hover {
+  border-color: var(--border-hover);
+}
+
+.stat-tile__icon {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.9rem;
+  color: #333;
+  display: flex;
 }
 
 .stat-tile__value {
@@ -563,6 +577,14 @@ input, select {
   text-transform: uppercase;
   color: var(--text-3);
   margin-top: 0.25rem;
+}
+
+/* ── Card container (stats sections) ── */
+.stats-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem 1rem;
 }
 
 /* ── Weekly activity bar chart (stats page) ── */
@@ -663,6 +685,58 @@ input, select {
   height: 100%;
   border-radius: 2px;
   background: #7a7a7a;
+}
+
+/* ── Per-track repeat stepper ── */
+.repeat-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 2px;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.repeat-stepper--active {
+  border-color: #666;
+}
+
+.repeat-stepper span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+  min-width: 24px;
+  text-align: center;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.repeat-stepper--active span {
+  color: var(--text-1);
+}
+
+.repeat-stepper button {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  padding: 0;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.repeat-stepper button:not(:disabled):hover {
+  color: var(--text-1);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.repeat-stepper button:disabled {
+  opacity: 0.3;
 }
 
 /* ── Ghost button ── */

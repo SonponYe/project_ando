@@ -7,6 +7,7 @@ import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 import TrackRow from '../components/TrackRow';
 import TrackCard from '../components/TrackCard';
+import PageHeader from '../components/PageHeader';
 import AddToPlaylistMenu from '../components/AddToPlaylistMenu';
 import { computeStats } from '../lib/stats';
 
@@ -182,13 +183,7 @@ const MusicPage = () => {
 
   return (
     <div className="page-wrap">
-      {/* heading */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#efefef', letterSpacing: '-0.5px', marginBottom: '0.2rem' }}>
-          Discover
-        </h1>
-        <p style={{ color: '#383838', fontSize: '0.82rem' }}>Search or pick a mood and genre</p>
-      </div>
+      <PageHeader title="Discover" subtitle="Search or pick a mood and genre" />
 
       {/* search */}
       <form onSubmit={handleSearch} style={{ position: 'relative', marginBottom: '1.75rem' }}>

@@ -3,6 +3,7 @@ import { LuX } from 'react-icons/lu';
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 import TrackRow from '../components/TrackRow';
+import PageHeader from '../components/PageHeader';
 import AddToPlaylistMenu from '../components/AddToPlaylistMenu';
 
 const FavoritesPage = () => {
@@ -17,16 +18,12 @@ const FavoritesPage = () => {
 
   return (
     <div className="page-wrap">
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#efefef', letterSpacing: '-0.5px', marginBottom: '0.2rem' }}>
-          Favorites
-        </h1>
-        <p style={{ color: '#383838', fontSize: '0.82rem' }}>
-          {favorites.length > 0
-            ? `${favorites.length} saved track${favorites.length !== 1 ? 's' : ''}`
-            : 'Your saved tracks'}
-        </p>
-      </div>
+      <PageHeader
+        title="Favorites"
+        subtitle={favorites.length > 0
+          ? `${favorites.length} saved track${favorites.length !== 1 ? 's' : ''}`
+          : 'Your saved tracks'}
+      />
 
       {favorites.length === 0 ? (
         <div className="state-center">

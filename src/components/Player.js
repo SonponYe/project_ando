@@ -11,6 +11,7 @@ import {
 import { PlaybackContext } from '../context/PlaybackContext';
 import { FavoritesContext } from '../context/FavoritesContext';
 import TrackRow from './TrackRow';
+import RepeatStepper from './RepeatStepper';
 import fallbackMark from '../images/ando-mark.png';
 
 const fmt = (s) => {
@@ -330,16 +331,22 @@ const Player = () => {
               <span style={{ fontSize: '0.74rem', color: '#3a3a3a', fontVariantNumeric: 'tabular-nums' }}>{fmt(dur)}</span>
             </div>
 
-            {/* playback mode */}
-            <button
-              onClick={cyclePlaybackMode}
-              aria-label={`Playback mode: ${modeConfig[playbackMode].label}. Click to change.`}
-              className={playbackMode !== 'order' ? 'chip chip--active' : 'chip'}
-              style={{ marginBottom: '1.25rem', gap: 6 }}
-            >
-              {modeConfig[playbackMode].icon}
-              {modeConfig[playbackMode].label}
-            </button>
+            {/* playback mode + this song's play count */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: '0.6rem', marginBottom: '1.25rem', flexWrap: 'wrap',
+            }}>
+              <button
+                onClick={cyclePlaybackMode}
+                aria-label={`Playback mode: ${modeConfig[playbackMode].label}. Click to change.`}
+                className={playbackMode !== 'order' ? 'chip chip--active' : 'chip'}
+                style={{ gap: 6 }}
+              >
+                {modeConfig[playbackMode].icon}
+                {modeConfig[playbackMode].label}
+              </button>
+              <RepeatStepper trackId={currentTrack.id} showIcon />
+            </div>
 
             {/* controls */}
             <div style={{
@@ -451,6 +458,7 @@ const Player = () => {
                     isCurrentlyPlaying={isNowPlaying && isPlaying}
                     onPlay={() => { jumpToIndex(realIdx); setShowQueue(false); }}
                   >
+                    <RepeatStepper trackId={track.id} />
                     {!isNowPlaying && (
                       <button
                         className="icon-btn"
